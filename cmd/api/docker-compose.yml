@@ -1,0 +1,6 @@
+version: '3'
+services:
+  api:
+    image: rgui/api:latest
+    environment:
+      - LOG_LEVEL=$LOG_LEVEL
