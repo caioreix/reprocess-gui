@@ -12,6 +12,7 @@ import (
 	"reprocess-gui/internal/apps/api/adapter/repository/mongodb"
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/service"
+	"reprocess-gui/internal/logger"
 )
 
 func main() {
@@ -23,24 +24,33 @@ func main() {
 		panic(err)
 	}
 
+	log, err := logger.New(config)
+	if err != nil {
+		panic(err)
+	}
+
 	ctx := context.Background()
 
 	mongo, err := mongodb.New(config)
 	if err != nil {
-		panic(err)
+		log.Fatal("failed creating mongo connection", []logger.Field{
+			{Key: "error", Value: err},
+		}...)
 	}
 	defer mongo.Close(ctx)
 
 	tableCollection := mongo.Database(config.Mongo.TableDatabase).Collection(config.Mongo.TableCollection)
 
-	tableRepository := mongodb.NewTableRepository(config, tableCollection)
-	tableService := service.NewTableService(config, tableRepository)
-	tableHandler := http.NewTableHandler(config, tableService)
+	tableRepository := mongodb.NewTableRepository(config, log, tableCollection)
+	tableService := service.NewTableService(config, log, tableRepository)
+	tableHandler := http.NewTableHandler(config, log, tableService)
 
 	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
 	router, err := http.NewRouter(addr, tableHandler)
 	if err != nil {
-		panic(err)
+		log.Fatal("failed creating the router", []logger.Field{
+			{Key: "error", Value: err},
+		}...)
 	}
 
 	// Graceful shutdown
@@ -48,10 +58,10 @@ func main() {
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		fmt.Printf("Running on: %s\n", addr)
+		log.Info(fmt.Sprintf("Running on: %s\n", addr))
 		router.Serve()
 	}()
 
 	<-done
-	fmt.Println("graceful shutdown.")
+	log.Warn(fmt.Sprintf("Running on: %s\n", addr))
 }

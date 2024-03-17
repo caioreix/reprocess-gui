@@ -8,8 +8,10 @@ import (
 )
 
 type Config struct {
-	Server Server
-	Mongo  Mongo
+	Environment string `default:"dev"`
+	Server      Server
+	Mongo       Mongo
+	Log         Log
 }
 
 type Server struct {
@@ -24,6 +26,10 @@ type Mongo struct {
 
 	TableDatabase   string `required:"true"`
 	TableCollection string `required:"true"`
+}
+
+type Log struct {
+	Level string `default:"debug"`
 }
 
 func New(path string) (*Config, error) {

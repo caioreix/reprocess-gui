@@ -8,16 +8,19 @@ import (
 
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/domain"
+	"reprocess-gui/internal/logger"
 )
 
 type tableRepository struct {
 	config     *config.Config
+	log        *logger.Logger
 	collection *mongo.Collection
 }
 
-func NewTableRepository(config *config.Config, collection *mongo.Collection) *tableRepository {
+func NewTableRepository(config *config.Config, log *logger.Logger, collection *mongo.Collection) *tableRepository {
 	return &tableRepository{
 		config:     config,
+		log:        log,
 		collection: collection,
 	}
 }
