@@ -2,32 +2,43 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"reprocess-gui/internal/api/adapter/driving/http"
-	"reprocess-gui/internal/api/adapter/repository/mongodb"
-	"reprocess-gui/internal/api/core/service"
+	"reprocess-gui/internal/apps/api/adapter/driving/http"
+	"reprocess-gui/internal/apps/api/adapter/repository/mongodb"
+	"reprocess-gui/internal/apps/api/config"
+	"reprocess-gui/internal/apps/api/core/service"
 )
 
 func main() {
+	configPath := flag.String("cpath", ".", "config path")
+	flag.Parse()
+
+	config, err := config.New(*configPath)
+	if err != nil {
+		panic(err)
+	}
+
 	ctx := context.Background()
 
-	mongo, err := mongodb.New("mongodb://caio:secret@localhost:27017")
+	mongo, err := mongodb.New(config)
 	if err != nil {
 		panic(err)
 	}
 	defer mongo.Close(ctx)
 
-	tableCollection := mongo.Database("api").Collection("tables")
+	tableCollection := mongo.Database(config.Mongo.TableDatabase).Collection(config.Mongo.TableCollection)
 
-	tableRepository := mongodb.NewTableRepository(tableCollection)
-	tableService := service.NewTableService(tableRepository)
-	tableHandler := http.NewTableHandler(tableService)
+	tableRepository := mongodb.NewTableRepository(config, tableCollection)
+	tableService := service.NewTableService(config, tableRepository)
+	tableHandler := http.NewTableHandler(config, tableService)
 
-	router, err := http.NewRouter(":8080", tableHandler)
+	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
+	router, err := http.NewRouter(addr, tableHandler)
 	if err != nil {
 		panic(err)
 	}
@@ -36,13 +47,10 @@ func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
-	fmt.Println("running...")
-
 	go func() {
+		fmt.Printf("Running on: %s\n", addr)
 		router.Serve()
 	}()
-
-	fmt.Println("waiting...")
 
 	<-done
 	fmt.Println("graceful shutdown.")

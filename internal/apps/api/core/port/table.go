@@ -3,7 +3,7 @@ package port
 import (
 	"context"
 
-	"reprocess-gui/internal/api/core/domain"
+	"reprocess-gui/internal/apps/api/core/domain"
 )
 
 type TableRepository interface {

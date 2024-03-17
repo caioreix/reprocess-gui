@@ -6,15 +6,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"reprocess-gui/internal/api/core/domain"
+	"reprocess-gui/internal/apps/api/config"
+	"reprocess-gui/internal/apps/api/core/domain"
 )
 
 type tableRepository struct {
+	config     *config.Config
 	collection *mongo.Collection
 }
 
-func NewTableRepository(collection *mongo.Collection) *tableRepository {
+func NewTableRepository(config *config.Config, collection *mongo.Collection) *tableRepository {
 	return &tableRepository{
+		config:     config,
 		collection: collection,
 	}
 }

@@ -5,16 +5,19 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"reprocess-gui/internal/api/core/port"
+	"reprocess-gui/internal/apps/api/config"
+	"reprocess-gui/internal/apps/api/core/port"
 )
 
 type tableHandler struct {
-	svc port.TableService
+	config *config.Config
+	svc    port.TableService
 }
 
-func NewTableHandler(svc port.TableService) *tableHandler {
+func NewTableHandler(config *config.Config, svc port.TableService) *tableHandler {
 	return &tableHandler{
-		svc,
+		config: config,
+		svc:    svc,
 	}
 }
 

@@ -1,7 +1,11 @@
 IMAGE_NAME=rgui/api
+CPATH=cmd/api/.local.env
 
 local:
-	go run ./cmd/api/...
+	@go run ./cmd/api/... -cpath $(CPATH)
+
+watch-local:
+	@reflex -r "\.go|.env$$" -s -- sh -c "go run ./cmd/api/... -cpath $(CPATH)"
 
 compose-start: docker-build
 	@cd ./cmd/api && $(MAKE) start
