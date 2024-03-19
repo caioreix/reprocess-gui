@@ -25,19 +25,22 @@ func NewTableHandler(config *config.Config, log *logger.Logger, svc port.TableSe
 }
 
 func (h *tableHandler) GetAllTables(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	tables, err := h.svc.GetAllTables(context.Background())
 	if err != nil {
 		h.log.Error(err, "failed getting tables")
+		handleError(w, err)
 		return
 	}
 
 	res, err := json.Marshal(tables)
 	if err != nil {
 		h.log.Error(err, "failed marshaling tables")
+		handleError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
