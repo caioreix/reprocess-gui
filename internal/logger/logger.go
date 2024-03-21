@@ -40,6 +40,11 @@ func (l Logger) Fields(fields ...Field) *Logger {
 	return &l
 }
 
+func (l Logger) Skip(skip int) *Logger {
+	l.log.WithOptions(zap.AddCallerSkip(1))
+	return &l
+}
+
 func (l *Logger) Debug(msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	l.log.Debug(msg, parseFields(fields...)...)

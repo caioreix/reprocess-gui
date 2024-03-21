@@ -9,8 +9,6 @@ import (
 )
 
 func errorParse(err error) (int, []byte) {
-	err = errors.Parse(err)
-
 	switch {
 	case errors.Is(err, errors.ErrEmptyResponse):
 		return errResponse(http.StatusNoContent, errors.ErrEmptyResponse.Error())
@@ -21,7 +19,7 @@ func errorParse(err error) (int, []byte) {
 
 func errResponse(status int, message string) (int, []byte) {
 	res := struct {
-		Error string
+		Error string `json:"error"`
 	}{message}
 
 	body, err := json.Marshal(res)
@@ -32,7 +30,9 @@ func errResponse(status int, message string) (int, []byte) {
 	return status, body
 }
 
-func handleError(w http.ResponseWriter, err error) {
+func (h *tableHandler) handleError(w http.ResponseWriter, err error, message string) {
+	err = errors.Parse(err)
+	h.log.Skip(1).Error(err, message)
 	status, res := errorParse(err)
 	w.WriteHeader(status)
 	w.Write(res)
