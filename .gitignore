@@ -23,3 +23,6 @@ go.work
 *.env
 !example.env
 api-build
+.vscode
+__debug_bin*
+debug.json

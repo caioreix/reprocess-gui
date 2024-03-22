@@ -1,6 +1,23 @@
 version: '3'
 services:
-  api:
-    image: rgui/api:latest
+  mongodb:
+    image: mongo
+    container_name: api-mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+    - mongodb_data_container:/data/db
     environment:
-      - LOG_LEVEL=$LOG_LEVEL
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+  # api:
+  #   image: rgui/api:latest
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     - LOG_LEVEL=$LOG_LEVEL
+  #   depends_on:
+  #     - mongodb
+volumes:
+  mongodb_data_container:
