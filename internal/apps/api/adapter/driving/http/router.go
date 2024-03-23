@@ -10,6 +10,7 @@ func NewRouter(addr string, tableHandler *tableHandler) (*router, error) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /tables", tableHandler.GetAllTables)
+	mux.HandleFunc("GET /tables/{team}", tableHandler.GetTableByTeam)
 
 	return &router{
 		&http.Server{

@@ -31,3 +31,12 @@ func (s *tableService) GetAllTables(ctx context.Context) ([]*domain.Table, error
 
 	return tables, nil
 }
+
+func (s *tableService) GetTableByTeam(ctx context.Context, team string) (*domain.Table, error) {
+	table, err := s.repo.GetTableByTeam(ctx, team)
+	if err != nil {
+		return nil, err
+	}
+
+	return table, nil
+}
