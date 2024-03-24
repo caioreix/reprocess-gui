@@ -22,7 +22,10 @@ func New(config *config.Config) (*Logger, error) {
 
 	settings.EncoderConfig = ecszap.ECSCompatibleEncoderConfig(settings.EncoderConfig)
 	settings.OutputPaths = []string{"stdout"}
-	settings.Level.UnmarshalText([]byte(config.Log.Level))
+	err := settings.Level.UnmarshalText([]byte(config.Log.Level))
+	if err != nil {
+		return nil, err
+	}
 
 	zapLogger, err := settings.Build(ecszap.WrapCoreOption(), zap.AddCaller(), zap.AddCallerSkip(1))
 	if err != nil {

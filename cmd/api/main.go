@@ -59,7 +59,10 @@ func main() {
 
 	go func() {
 		log.Info(fmt.Sprintf("Running on: %s\n", addr))
-		router.Serve()
+		err := router.Serve()
+		log.Fatal("failed server running", []logger.Field{
+			{Key: "error", Value: err},
+		}...)
 	}()
 
 	<-done

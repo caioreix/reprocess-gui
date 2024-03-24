@@ -40,7 +40,10 @@ func (h *tableHandler) GetAllTables(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	_, err = w.Write(res)
+	if err != nil {
+		h.handleError(w, err, "failed writing get all tables response to client")
+	}
 }
 
 func (h *tableHandler) GetTableByTeam(w http.ResponseWriter, r *http.Request) {
@@ -61,5 +64,8 @@ func (h *tableHandler) GetTableByTeam(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	_, err = w.Write(res)
+	if err != nil {
+		h.handleError(w, err, "failed writing get table by team response to client")
+	}
 }

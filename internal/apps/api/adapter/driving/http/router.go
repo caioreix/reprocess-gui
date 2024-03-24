@@ -20,6 +20,6 @@ func NewRouter(addr string, tableHandler *tableHandler) (*router, error) {
 	}, nil
 }
 
-func (r *router) Serve() {
-	r.ListenAndServe()
+func (r *router) Serve() error {
+	return r.ListenAndServe()
 }

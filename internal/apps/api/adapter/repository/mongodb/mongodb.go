@@ -34,6 +34,6 @@ func New(config *config.Config) (*db, error) {
 	}, nil
 }
 
-func (db *db) Close(ctx context.Context) {
-	db.Disconnect(ctx)
+func (db *db) Close(ctx context.Context) error {
+	return db.Disconnect(ctx)
 }

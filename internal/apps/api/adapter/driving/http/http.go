@@ -35,5 +35,8 @@ func (h *tableHandler) handleError(w http.ResponseWriter, err error, message str
 	h.log.Skip(1).Error(err, message)
 	status, res := errorParse(err)
 	w.WriteHeader(status)
-	w.Write(res)
+	_, err = w.Write(res)
+	if err != nil {
+		h.log.Error(err, "failed writing error response to client")
+	}
 }
