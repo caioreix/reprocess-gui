@@ -37,7 +37,7 @@ func TestGetTableByTeam(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("Fail", func(t *testing.T) {
 		var (
 			ctx, config, logger, repoMock = tableSetupTest(t)
 		)
@@ -75,7 +75,7 @@ func TestGetAllTables(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("Fail", func(t *testing.T) {
 		var (
 			ctx, config, logger, repoMock = tableSetupTest(t)
 		)
