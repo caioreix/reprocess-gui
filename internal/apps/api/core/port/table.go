@@ -8,8 +8,10 @@ import (
 
 type TableRepository interface {
 	GetAllTables(ctx context.Context) ([]*domain.Table, error)
+	GetTableByTeam(ctx context.Context, team string) (*domain.Table, error)
 }
 
 type TableService interface {
 	GetAllTables(ctx context.Context) ([]*domain.Table, error)
+	GetTableByTeam(ctx context.Context, team string) (*domain.Table, error)
 }

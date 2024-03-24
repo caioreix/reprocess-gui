@@ -19,6 +19,37 @@ import (
 	"reprocess-gui/internal/logger"
 )
 
+func TestGetTableByTeam(t *testing.T) {
+	t.Run("Sucess", func(t *testing.T) {
+		var (
+			config, logger, serviceMock = tableSetupTest(t)
+			want                        = &domain.Table{
+				Name: "table1", Team: "team1", Default: true,
+			}
+		)
+		expected, err := json.Marshal(want)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodGet, "/tables/team1", nil)
+		w := httptest.NewRecorder()
+
+		serviceMock.
+			On("GetTableByTeam", mock.AnythingOfType("context.backgroundCtx"), "").
+			Return(want, nil).Once()
+
+		handler := handler.NewTableHandler(config, logger, serviceMock)
+		handler.GetTableByTeam(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		data, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+	})
+}
+
 func TestGetAllTables(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (

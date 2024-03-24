@@ -48,3 +48,18 @@ func (r *tableRepository) GetAllTables(ctx context.Context) ([]*domain.Table, er
 
 	return tables, nil
 }
+
+func (r *tableRepository) GetTableByTeam(ctx context.Context, team string) (*domain.Table, error) {
+	res := r.collection.FindOne(context.Background(), bson.M{"team": team})
+	if err := res.Err(); err != nil {
+		return nil, err
+	}
+
+	table := &domain.Table{}
+	err := res.Decode(table)
+	if err != nil {
+		return nil, err
+	}
+
+	return table, nil
+}

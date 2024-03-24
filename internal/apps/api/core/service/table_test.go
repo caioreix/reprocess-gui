@@ -15,6 +15,45 @@ import (
 	"reprocess-gui/internal/logger"
 )
 
+func TestGetTableByTeam(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		var (
+			ctx, config, logger, repoMock = tableSetupTest(t)
+			want                          = &domain.Table{
+				Name:    "table1",
+				Team:    "team1",
+				Default: true,
+			}
+		)
+
+		repoMock.
+			On("GetTableByTeam", ctx, "team1").
+			Return(want, nil).Once()
+
+		s := service.NewTableService(config, logger, repoMock)
+
+		got, err := s.GetTableByTeam(ctx, "team1")
+		assert.NoError(t, err)
+		assert.Equal(t, want, got)
+	})
+
+	t.Run("Fail", func(t *testing.T) {
+		var (
+			ctx, config, logger, repoMock = tableSetupTest(t)
+		)
+
+		repoMock.
+			On("GetTableByTeam", ctx, "team1").
+			Return(nil, errors.ErrEmptyResponse).Once()
+
+		s := service.NewTableService(config, logger, repoMock)
+
+		got, err := s.GetTableByTeam(ctx, "team1")
+		assert.ErrorIs(t, err, errors.ErrEmptyResponse)
+		assert.Nil(t, got)
+	})
+}
+
 func TestGetAllTables(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
@@ -36,7 +75,7 @@ func TestGetAllTables(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("Fail", func(t *testing.T) {
 		var (
 			ctx, config, logger, repoMock = tableSetupTest(t)
 		)

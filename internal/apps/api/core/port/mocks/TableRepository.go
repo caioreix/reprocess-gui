@@ -44,6 +44,36 @@ func (_m *TableRepository) GetAllTables(ctx context.Context) ([]*domain.Table, e
 	return r0, r1
 }
 
+// GetTableByTeam provides a mock function with given fields: ctx, team
+func (_m *TableRepository) GetTableByTeam(ctx context.Context, team string) (*domain.Table, error) {
+	ret := _m.Called(ctx, team)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTableByTeam")
+	}
+
+	var r0 *domain.Table
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*domain.Table, error)); ok {
+		return rf(ctx, team)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *domain.Table); ok {
+		r0 = rf(ctx, team)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Table)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, team)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewTableRepository creates a new instance of TableRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewTableRepository(t interface {

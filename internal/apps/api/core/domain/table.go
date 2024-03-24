@@ -2,6 +2,7 @@ package domain
 
 type Table struct {
 	Name          string          `json:"name" bson:"name"`
+	Team          string          `json:"team" bson:"team"`
 	CustomColumns []*CustomColumn `json:"custom_columns" bson:"custom_columns"`
 	Default       bool            `json:"default" bson:"default"`
 }
