@@ -16,7 +16,7 @@ mocks:
 	@find ./internal/apps/*/core/port -type f -name '*.go' -exec bash -c 'dir=$$(dirname "{}"); cd $$dir; mockery --dir . --outpkg $$(basename "$$dir")mock --name=".*"' \;
 
 test:
-	@go test -v -race ./...
+	@go test -race -count=1 -cover ./...
 
 local-api:
 	@$(MAKE) -f makefiles/api.mk local
