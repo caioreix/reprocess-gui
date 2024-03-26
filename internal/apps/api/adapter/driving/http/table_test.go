@@ -87,7 +87,7 @@ func TestGetAllTables(t *testing.T) {
 			want                        = struct {
 				Error string `json:"error"`
 			}{
-				Error: "empty response value",
+				Error: "empty response value: failed getting tables",
 			}
 		)
 		expected, err := json.Marshal(want)
@@ -109,7 +109,7 @@ func TestGetAllTables(t *testing.T) {
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		assert.Equal(t, string(expected), string(data))
-		assert.Equal(t, http.StatusNoContent, w.Result().StatusCode)
+		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
 	})
 }
 
