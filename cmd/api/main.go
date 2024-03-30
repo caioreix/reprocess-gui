@@ -45,8 +45,14 @@ func main() {
 	tableService := service.NewTableService(config, log, tableRepository)
 	tableHandler := http.NewTableHandler(config, log, tableService)
 
+	rowCollection := mongo.Database(config.Mongo.RowDatabase).Collection(config.Mongo.RowCollection)
+
+	rowRepository := mongodb.NewRowRepository(config, log, rowCollection)
+	rowService := service.NewRowService(config, log, rowRepository)
+	rowHandler := http.NewRowHandler(config, log, rowService)
+
 	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
-	router, err := http.NewRouter(addr, tableHandler)
+	router, err := http.NewRouter(addr, tableHandler, rowHandler)
 	if err != nil {
 		log.Fatal("failed creating the router", []logger.Field{
 			{Key: "error", Value: err},

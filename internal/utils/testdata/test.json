@@ -1,0 +1,7 @@
+{
+  "error": "My error",
+  "nest": {
+    "active": true
+  },
+  "price": 10.99
+}

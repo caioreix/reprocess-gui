@@ -50,7 +50,7 @@ func (r *tableRepository) GetAllTables(ctx context.Context) ([]*domain.Table, er
 }
 
 func (r *tableRepository) GetTableByTeam(ctx context.Context, team string) (*domain.Table, error) {
-	res := r.collection.FindOne(context.Background(), bson.M{"team": team})
+	res := r.collection.FindOne(ctx, bson.M{"team": team})
 	if err := res.Err(); err != nil {
 		return nil, err
 	}

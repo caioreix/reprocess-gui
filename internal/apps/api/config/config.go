@@ -26,6 +26,9 @@ type Mongo struct {
 
 	TableDatabase   string `required:"true"`
 	TableCollection string `required:"true"`
+
+	RowDatabase   string `required:"true"`
+	RowCollection string `required:"true"`
 }
 
 type Log struct {
