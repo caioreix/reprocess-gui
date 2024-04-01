@@ -85,11 +85,11 @@ func tableSetupTest(t *mtest.T) (context.Context, *config.Config, *logger.Logger
 
 	var (
 		ctx        = context.TODO()
-		config     = &config.Config{Log: config.Log{Level: "debug"}}
+		config     = &config.Config{}
 		collection = t.Coll
 	)
 
-	logger, err := logger.New(config)
+	logger, err := logger.New("debug")
 	require.NoError(t, err)
 
 	return ctx, config, logger, collection
