@@ -87,7 +87,7 @@ func TestGetAllTables(t *testing.T) {
 			want                        = struct {
 				Error string `json:"error"`
 			}{
-				Error: "empty response value",
+				Error: "empty response value: failed getting tables",
 			}
 		)
 		expected, err := json.Marshal(want)
@@ -109,7 +109,7 @@ func TestGetAllTables(t *testing.T) {
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		assert.Equal(t, string(expected), string(data))
-		assert.Equal(t, http.StatusNoContent, w.Result().StatusCode)
+		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
 	})
 }
 
@@ -117,11 +117,11 @@ func tableSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.Tab
 	t.Helper()
 
 	var (
-		config      = &config.Config{Log: config.Log{Level: "debug"}}
+		config      = &config.Config{}
 		serviceMock = portmock.NewTableService(t)
 	)
 
-	logger, err := logger.New(config)
+	logger, err := logger.New("debug")
 	require.NoError(t, err)
 
 	return config, logger, serviceMock

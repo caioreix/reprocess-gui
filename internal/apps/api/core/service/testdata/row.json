@@ -1,0 +1,19 @@
+{
+  "error": "My error message",
+  "value": {
+    "id": "4321",
+    "content": "string",
+    "order_id": "12543"
+  },
+  "headers": {
+    "id_reference": "1234",
+    "address": {
+      "city": "Mineiros",
+      "country": "Brazil"
+    }
+  },
+  "table_name": "channels-api",
+  "target": "MESSAGE_RETRY",
+  "type": "kafka",
+  "status": "pending"
+}

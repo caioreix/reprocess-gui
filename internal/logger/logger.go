@@ -3,8 +3,6 @@ package logger
 import (
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
-
-	"reprocess-gui/internal/apps/api/config"
 )
 
 type Field struct {
@@ -17,12 +15,12 @@ type Logger struct {
 	fields []Field
 }
 
-func New(config *config.Config) (*Logger, error) {
+func New(level string) (*Logger, error) {
 	settings := zap.NewProductionConfig()
 
 	settings.EncoderConfig = ecszap.ECSCompatibleEncoderConfig(settings.EncoderConfig)
 	settings.OutputPaths = []string{"stdout"}
-	err := settings.Level.UnmarshalText([]byte(config.Log.Level))
+	err := settings.Level.UnmarshalText([]byte(level))
 	if err != nil {
 		return nil, err
 	}
