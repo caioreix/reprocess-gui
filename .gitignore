@@ -26,3 +26,4 @@ api-build
 .vscode
 __debug_bin*
 debug.json
+cmd/*/config

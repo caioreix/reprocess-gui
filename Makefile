@@ -48,3 +48,17 @@ compose-api:
 
 compose-api-stop:
 	@$(MAKE) -f makefiles/api.mk compose-stop
+
+# WORKER
+
+local-worker:
+	@$(MAKE) -f makefiles/worker.mk local
+
+watch-worker:
+	@$(MAKE) -f makefiles/worker.mk watch-local
+
+compose-worker:
+	@$(MAKE) -f makefiles/worker.mk compose-start
+
+compose-worker-stop:
+	@$(MAKE) -f makefiles/worker.mk compose-stop

@@ -84,5 +84,5 @@ func main() {
 	}()
 
 	<-done
-	log.Warn(fmt.Sprintf("Running on: %s\n", addr))
+	log.Warn("finished graceful shutdown")
 }
