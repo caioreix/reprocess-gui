@@ -56,12 +56,13 @@ func rowSetupTest(t *testing.T) (context.Context, *config.Config, *logger.Logger
 	t.Helper()
 
 	var (
-		ctx      = context.TODO()
-		config   = &config.Config{}
-		repoMock = portmock.NewRowRepository(t)
+		ctx       = context.TODO()
+		config    = &config.Config{}
+		repoMock  = portmock.NewRowRepository(t)
+		loggerCfg = logger.LoggerConfig{Level: "debug", Environment: "test"}
 	)
 
-	logger, err := logger.New("debug")
+	logger, err := loggerCfg.New()
 	require.NoError(t, err)
 
 	return ctx, config, logger, repoMock

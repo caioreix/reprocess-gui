@@ -119,9 +119,10 @@ func tableSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.Tab
 	var (
 		config      = &config.Config{}
 		serviceMock = portmock.NewTableService(t)
+		loggerCfg   = logger.LoggerConfig{Level: "debug", Environment: "test"}
 	)
 
-	logger, err := logger.New("debug")
+	logger, err := loggerCfg.New()
 	require.NoError(t, err)
 
 	return config, logger, serviceMock

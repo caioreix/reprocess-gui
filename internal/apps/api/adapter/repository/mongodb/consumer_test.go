@@ -62,9 +62,10 @@ func consumerSetupTest(t *mtest.T) (context.Context, *config.Config, *logger.Log
 		ctx        = context.TODO()
 		config     = &config.Config{}
 		collection = t.Coll
+		loggerCfg  = logger.LoggerConfig{Level: "debug", Environment: "test"}
 	)
 
-	logger, err := logger.New("debug")
+	logger, err := loggerCfg.New()
 	require.NoError(t, err)
 
 	return ctx, config, logger, collection

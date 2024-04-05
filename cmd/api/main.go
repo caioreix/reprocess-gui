@@ -24,7 +24,11 @@ func main() {
 		panic(err)
 	}
 
-	log, err := logger.New(config.Log.Level)
+	loggerCfg := logger.LoggerConfig{
+		Level:       config.Log.Level,
+		Environment: config.Environment,
+	}
+	log, err := loggerCfg.New()
 	if err != nil {
 		panic(err)
 	}

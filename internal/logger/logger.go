@@ -1,9 +1,15 @@
 package logger
 
 import (
+	prettyconsole "github.com/thessem/zap-prettyconsole"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 )
+
+type LoggerConfig struct {
+	Level       string
+	Environment string
+}
 
 type Field struct {
 	Key   string
@@ -15,12 +21,16 @@ type Logger struct {
 	fields []Field
 }
 
-func New(level string) (*Logger, error) {
+func (c *LoggerConfig) New() (*Logger, error) {
 	settings := zap.NewProductionConfig()
-
 	settings.EncoderConfig = ecszap.ECSCompatibleEncoderConfig(settings.EncoderConfig)
+
+	if c.Environment == "local" {
+		settings = prettyconsole.NewConfig()
+	}
+
 	settings.OutputPaths = []string{"stdout"}
-	err := settings.Level.UnmarshalText([]byte(level))
+	err := settings.Level.UnmarshalText([]byte(c.Level))
 	if err != nil {
 		return nil, err
 	}

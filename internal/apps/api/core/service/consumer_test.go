@@ -56,12 +56,13 @@ func consumerSetupTest(t *testing.T) (context.Context, *config.Config, *logger.L
 	t.Helper()
 
 	var (
-		ctx      = context.TODO()
-		config   = &config.Config{}
-		repoMock = portmock.NewConsumerRepository(t)
+		ctx       = context.TODO()
+		config    = &config.Config{}
+		repoMock  = portmock.NewConsumerRepository(t)
+		loggerCfg = logger.LoggerConfig{Level: "debug", Environment: "test"}
 	)
 
-	logger, err := logger.New("debug")
+	logger, err := loggerCfg.New()
 	require.NoError(t, err)
 
 	return ctx, config, logger, repoMock

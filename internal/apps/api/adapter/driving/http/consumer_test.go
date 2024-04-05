@@ -130,9 +130,10 @@ func consumerSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.
 	var (
 		config      = &config.Config{}
 		serviceMock = portmock.NewConsumerService(t)
+		loggerCfg   = logger.LoggerConfig{Level: "debug", Environment: "test"}
 	)
 
-	logger, err := logger.New("debug")
+	logger, err := loggerCfg.New()
 	require.NoError(t, err)
 
 	return config, logger, serviceMock
