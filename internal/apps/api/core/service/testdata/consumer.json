@@ -1,0 +1,8 @@
+{
+  "name": "CHANNELS_API_DLQ",
+  "type": "kafka",
+  "table": "channels-api",
+  "team": "channels",
+  "target": "CHANNELS_API_RETRY",
+  "target_type": "kafka"
+}

@@ -29,6 +29,9 @@ type Mongo struct {
 
 	RowDatabase   string `required:"true"`
 	RowCollection string `required:"true"`
+
+	ConsumerDatabase   string `required:"true"`
+	ConsumerCollection string `required:"true"`
 }
 
 type Log struct {

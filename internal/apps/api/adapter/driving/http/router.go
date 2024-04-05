@@ -2,17 +2,25 @@ package http
 
 import "net/http"
 
+type Router struct {
+	TableHandler    *tableHandler
+	RowHandler      *rowHandler
+	ConsumerHandler *consumerHandler
+}
+
 type router struct {
 	*http.Server
 }
 
-func NewRouter(addr string, tableHandler *tableHandler, rowHandler *rowHandler) (*router, error) {
+func (r *Router) NewRouter(addr string) (*router, error) {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /tables", tableHandler.GetAllTables)
-	mux.HandleFunc("GET /tables/{team}", tableHandler.GetTableByTeam)
+	mux.HandleFunc("GET /tables", r.TableHandler.GetAllTables)
+	mux.HandleFunc("GET /tables/{team}", r.TableHandler.GetTableByTeam)
 
-	mux.HandleFunc("POST /error", rowHandler.InsertNewError)
+	mux.HandleFunc("POST /error", r.RowHandler.InsertNewError)
+
+	mux.HandleFunc("POST /consumer", r.ConsumerHandler.InsertNewConsumer)
 
 	return &router{
 		&http.Server{
