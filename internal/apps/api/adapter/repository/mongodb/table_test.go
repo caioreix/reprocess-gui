@@ -14,6 +14,7 @@ import (
 	"reprocess-gui/internal/apps/api/adapter/repository/mongodb"
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/domain"
+	"reprocess-gui/internal/common"
 	"reprocess-gui/internal/logger"
 )
 
@@ -87,7 +88,7 @@ func tableSetupTest(t *mtest.T) (context.Context, *config.Config, *logger.Logger
 		ctx        = context.TODO()
 		config     = &config.Config{}
 		collection = t.Coll
-		loggerCfg  = logger.LoggerConfig{Level: "debug", Environment: "test"}
+		loggerCfg  = logger.LoggerConfig{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
 	logger, err := loggerCfg.New()

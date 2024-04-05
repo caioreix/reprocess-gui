@@ -15,6 +15,7 @@ import (
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/domain"
 	portmock "reprocess-gui/internal/apps/api/core/port/mocks"
+	"reprocess-gui/internal/common"
 	"reprocess-gui/internal/errors"
 	"reprocess-gui/internal/logger"
 )
@@ -119,7 +120,7 @@ func tableSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.Tab
 	var (
 		config      = &config.Config{}
 		serviceMock = portmock.NewTableService(t)
-		loggerCfg   = logger.LoggerConfig{Level: "debug", Environment: "test"}
+		loggerCfg   = logger.LoggerConfig{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
 	logger, err := loggerCfg.New()

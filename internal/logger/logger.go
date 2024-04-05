@@ -4,6 +4,8 @@ import (
 	prettyconsole "github.com/thessem/zap-prettyconsole"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
+
+	"reprocess-gui/internal/common"
 )
 
 type LoggerConfig struct {
@@ -25,7 +27,7 @@ func (c *LoggerConfig) New() (*Logger, error) {
 	settings := zap.NewProductionConfig()
 	settings.EncoderConfig = ecszap.ECSCompatibleEncoderConfig(settings.EncoderConfig)
 
-	if c.Environment == "local" {
+	if c.Environment == common.EnvironmentLocal {
 		settings = prettyconsole.NewConfig()
 	}
 
