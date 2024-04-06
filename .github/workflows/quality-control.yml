@@ -21,9 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: securego/gosec@latest
+      - uses: actions/setup-go@v4
         with:
-          args: ./...
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+      - run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+      - run: make sec
 
   tests:
     name: Tests
@@ -36,3 +39,20 @@ jobs:
           cache: false
       - run: make test
     needs: [lint, sec]
+
+  review:
+    name: Trigger Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GTOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '@coderabbitai review'
+            })
+    needs: [lint, sec, tests]
