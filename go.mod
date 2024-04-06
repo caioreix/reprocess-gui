@@ -3,10 +3,10 @@ module reprocess-gui
 go 1.22.1
 
 require (
-	github.com/google/uuid v1.6.0
 	github.com/jinzhu/configor v1.2.2
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.8.1
+	github.com/thessem/zap-prettyconsole v0.4.0
 	go.elastic.co/ecszap v1.0.2
 	go.mongodb.org/mongo-driver v1.14.0
 	go.uber.org/zap v1.27.0
@@ -24,7 +24,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/thessem/zap-prettyconsole v0.4.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect

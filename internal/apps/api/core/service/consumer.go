@@ -16,6 +16,7 @@ type consumerService struct {
 	repo   port.ConsumerRepository
 }
 
+// NewConsumerService creates a new instance of consumerService.
 func NewConsumerService(config *config.Config, log *logger.Logger, repo port.ConsumerRepository) *consumerService {
 	return &consumerService{
 		config: config,
@@ -24,6 +25,7 @@ func NewConsumerService(config *config.Config, log *logger.Logger, repo port.Con
 	}
 }
 
+// InsertNewConsumer inserts a new consumer into the repository.
 func (s *consumerService) InsertNewConsumer(ctx context.Context, consumer *domain.Consumer) (*domain.Consumer, error) {
 	consumer.ID = ""
 	consumer.CreatedAT = time.Now()

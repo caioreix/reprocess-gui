@@ -9,13 +9,17 @@ import (
 )
 
 var (
-	ErrEmptyResponse       = new("empty response value")
-	ErrNotMapped           = new("not mapped")
-	ErrInternalServerError = new("internal server error")
+	// ErrEmptyResponse represents an error indicating an empty response value.
+	ErrEmptyResponse = newErr("empty response value")
+	// ErrNotMapped represents an error indicating a situation where the error is not mapped.
+	ErrNotMapped = newErr("not mapped")
+	// ErrInternalServerError represents an internal server error.
+	ErrInternalServerError = newErr("internal server error")
 
-	// HTTP
-	ErrBadRequest = new("bad request")
-	ErrNotFound   = new("not found")
+	// ErrBadRequest represents a bad request error.
+	ErrBadRequest = newErr("bad request")
+	// ErrNotFound represents a not found error.
+	ErrNotFound = newErr("not found")
 )
 
 type err struct {
@@ -23,16 +27,18 @@ type err struct {
 	message  string
 }
 
-func new(message string) error {
+func newErr(message string) error {
 	return &err{
 		original: errors.New(message),
 	}
 }
 
+// New returns a formatted error that combines two errors.
 func New(err, target error) error {
 	return fmt.Errorf("%w: %w", err, target)
 }
 
+// Error returns the error message.
 func (e *err) Error() string {
 	if e == nil {
 		return ""
@@ -45,6 +51,7 @@ func (e *err) Error() string {
 	return msg
 }
 
+// Is checks if the error is of the same type as the target error.
 func Is(errTree, target error) bool {
 	e, ok := errTree.(*err)
 	if ok {
@@ -61,6 +68,7 @@ func Is(errTree, target error) bool {
 	return errors.Is(errTree, target)
 }
 
+// Parse handles errors and returns a formatted error.
 func Parse(oErr error, messages ...string) error {
 	if oErr == nil {
 		return nil

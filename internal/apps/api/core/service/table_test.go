@@ -100,7 +100,7 @@ func tableSetupTest(t *testing.T) (context.Context, *config.Config, *logger.Logg
 		ctx       = context.TODO()
 		config    = &config.Config{}
 		repoMock  = portmock.NewTableRepository(t)
-		loggerCfg = logger.LoggerConfig{Level: "debug", Environment: common.EnvironmentTest}
+		loggerCfg = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
 	logger, err := loggerCfg.New()

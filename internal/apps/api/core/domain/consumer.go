@@ -2,6 +2,7 @@ package domain
 
 import "time"
 
+// Consumer represents the consumer data.
 type Consumer struct {
 	ID         string `json:"id" bson:"_id,omitempty"`
 	Name       string `json:"name" bson:"name"`

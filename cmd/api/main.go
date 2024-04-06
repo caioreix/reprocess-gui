@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	configPath := flag.String("cpath", ".", "config path")
+	configPath := flag.String("cpath", "", "config path")
 	flag.Parse()
 
 	config, err := config.New(*configPath)
@@ -24,7 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	loggerCfg := logger.LoggerConfig{
+	loggerCfg := logger.Config{
 		Level:       config.Log.Level,
 		Environment: config.Environment,
 	}
@@ -64,7 +64,7 @@ func main() {
 		ConsumerHandler: consumerHandler,
 	}
 	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
-	router, err := r.NewRouter(addr)
+	router, err := r.NewRouter(addr, config.Server.ReadHeaderTimeout)
 	if err != nil {
 		log.Fatal("failed creating the router", []logger.Field{
 			{Key: "error", Value: err},

@@ -63,7 +63,7 @@ func rowSetupTest(t *mtest.T) (context.Context, *config.Config, *logger.Logger, 
 		ctx        = context.TODO()
 		config     = &config.Config{}
 		collection = t.Coll
-		loggerCfg  = logger.LoggerConfig{Level: "debug", Environment: common.EnvironmentTest}
+		loggerCfg  = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
 	logger, err := loggerCfg.New()

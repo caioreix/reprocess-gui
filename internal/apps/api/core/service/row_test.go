@@ -60,7 +60,7 @@ func rowSetupTest(t *testing.T) (context.Context, *config.Config, *logger.Logger
 		ctx       = context.TODO()
 		config    = &config.Config{}
 		repoMock  = portmock.NewRowRepository(t)
-		loggerCfg = logger.LoggerConfig{Level: "debug", Environment: common.EnvironmentTest}
+		loggerCfg = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
 	logger, err := loggerCfg.New()

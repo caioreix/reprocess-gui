@@ -131,7 +131,7 @@ func consumerSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.
 	var (
 		config      = &config.Config{}
 		serviceMock = portmock.NewConsumerService(t)
-		loggerCfg   = logger.LoggerConfig{Level: "debug", Environment: common.EnvironmentTest}
+		loggerCfg   = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
 	logger, err := loggerCfg.New()

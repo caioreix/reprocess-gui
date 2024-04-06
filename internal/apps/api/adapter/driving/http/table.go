@@ -16,6 +16,7 @@ type tableHandler struct {
 	svc    port.TableService
 }
 
+// NewTableHandler creates a new instance of tableHandler.
 func NewTableHandler(config *config.Config, log *logger.Logger, svc port.TableService) *tableHandler {
 	return &tableHandler{
 		config: config,
@@ -24,7 +25,8 @@ func NewTableHandler(config *config.Config, log *logger.Logger, svc port.TableSe
 	}
 }
 
-func (h *tableHandler) GetAllTables(w http.ResponseWriter, r *http.Request) {
+// GetAllTables retrieves all tables and writes them as JSON to the response.
+func (h *tableHandler) GetAllTables(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	tables, err := h.svc.GetAllTables(context.Background())
@@ -46,6 +48,7 @@ func (h *tableHandler) GetAllTables(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetTableByTeam retrieves a table by team and writes it as JSON to the response.
 func (h *tableHandler) GetTableByTeam(w http.ResponseWriter, r *http.Request) {
 	team := r.PathValue("team")
 

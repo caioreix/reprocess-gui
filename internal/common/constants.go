@@ -1,6 +1,7 @@
 package common
 
-const /*Environments*/ (
+// Environments constants representing various types
+const (
 	EnvironmentTest  = "test"
 	EnvironmentLocal = "local"
 	EnvironmentDev   = "dev"

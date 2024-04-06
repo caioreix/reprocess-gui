@@ -18,6 +18,7 @@ type consumerHandler struct {
 	svc    port.ConsumerService
 }
 
+// NewConsumerHandler creates a new instance of consumerHandler.
 func NewConsumerHandler(config *config.Config, log *logger.Logger, svc port.ConsumerService) *consumerHandler {
 	return &consumerHandler{
 		config: config,
@@ -26,6 +27,7 @@ func NewConsumerHandler(config *config.Config, log *logger.Logger, svc port.Cons
 	}
 }
 
+// InsertNewConsumer handles the HTTP POST request to insert a new consumer.
 func (h *consumerHandler) InsertNewConsumer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

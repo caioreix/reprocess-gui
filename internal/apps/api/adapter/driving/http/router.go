@@ -1,7 +1,11 @@
 package http
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
+// Router provides a routing mechanism for handling HTTP requests.
 type Router struct {
 	TableHandler    *tableHandler
 	RowHandler      *rowHandler
@@ -12,7 +16,9 @@ type router struct {
 	*http.Server
 }
 
-func (r *Router) NewRouter(addr string) (*router, error) {
+// NewRouter creates a new HTTP router with the specified address.
+// It sets up handlers for various HTTP endpoints and returns a router.
+func (r *Router) NewRouter(addr string, readHeaderTimeout time.Duration) (*router, error) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /tables", r.TableHandler.GetAllTables)
@@ -24,12 +30,14 @@ func (r *Router) NewRouter(addr string) (*router, error) {
 
 	return &router{
 		&http.Server{
-			Addr:    addr,
-			Handler: mux,
+			ReadHeaderTimeout: readHeaderTimeout,
+			Addr:              addr,
+			Handler:           mux,
 		},
 	}, nil
 }
 
+// Serve starts serving HTTP requests.
 func (r *router) Serve() error {
 	return r.ListenAndServe()
 }

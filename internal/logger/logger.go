@@ -8,22 +8,26 @@ import (
 	"reprocess-gui/internal/common"
 )
 
-type LoggerConfig struct {
+// Config represents the configuration for the logger.
+type Config struct {
 	Level       string
 	Environment string
 }
 
+// Field represents a key-value pair for additional contextual information in logs.
 type Field struct {
 	Key   string
 	Value any
 }
 
+// Logger represents a customizable logger instance.
 type Logger struct {
 	log    *zap.Logger
 	fields []Field
 }
 
-func (c *LoggerConfig) New() (*Logger, error) {
+// New creates a new logger instance based on the provided configuration.
+func (c *Config) New() (*Logger, error) {
 	settings := zap.NewProductionConfig()
 	settings.EncoderConfig = ecszap.ECSCompatibleEncoderConfig(settings.EncoderConfig)
 
@@ -48,31 +52,37 @@ func (c *LoggerConfig) New() (*Logger, error) {
 	}, nil
 }
 
+// Fields adds additional fields to the logger instance creating a copy from the original logger.
 func (l Logger) Fields(fields ...Field) *Logger {
 	l.fields = append(l.fields, fields...)
 	return &l
 }
 
+// Skip sets the caller skip count for the logger instance.
 func (l Logger) Skip(skip int) *Logger {
-	l.log.WithOptions(zap.AddCallerSkip(1))
+	l.log.WithOptions(zap.AddCallerSkip(skip))
 	return &l
 }
 
+// Debug logs a message at debug level with optional additional fields.
 func (l *Logger) Debug(msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	l.log.Debug(msg, parseFields(fields...)...)
 }
 
+// Info logs a message at info level with optional additional fields.
 func (l *Logger) Info(msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	l.log.Info(msg, parseFields(fields...)...)
 }
 
+// Warn logs a message at warning level with optional additional fields.
 func (l *Logger) Warn(msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	l.log.Warn(msg, parseFields(fields...)...)
 }
 
+// Error logs a message at error level with optional additional fields and an error.
 func (l *Logger) Error(err error, msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	zapFields := parseFields(l.fields...)
@@ -80,11 +90,13 @@ func (l *Logger) Error(err error, msg string, fields ...Field) {
 	l.log.Error(msg, zapFields...)
 }
 
+// Panic logs a message at panic level with optional additional fields and panics after logging.
 func (l *Logger) Panic(msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	l.log.Panic(msg, parseFields(fields...)...)
 }
 
+// Fatal logs a message at fatal level with optional additional fields and then calls os.Exit(1).
 func (l *Logger) Fatal(msg string, fields ...Field) {
 	l.fields = append(l.fields, fields...)
 	l.log.Fatal(msg, parseFields(fields...)...)
