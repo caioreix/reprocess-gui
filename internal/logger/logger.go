@@ -60,7 +60,7 @@ func (l Logger) Fields(fields ...Field) *Logger {
 
 // Skip sets the caller skip count for the logger instance.
 func (l Logger) Skip(skip int) *Logger {
-	l.log.WithOptions(zap.AddCallerSkip(skip))
+	l.log = l.log.WithOptions(zap.AddCallerSkip(skip))
 	return &l
 }
 

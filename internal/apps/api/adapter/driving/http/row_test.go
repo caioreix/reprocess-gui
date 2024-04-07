@@ -33,7 +33,8 @@ func TestInsertNewError(t *testing.T) {
 		require.NoError(t, err)
 		_, err = utils.LoadJSONToStruct("testdata/row.json", row)
 		require.NoError(t, err)
-		expected, err := json.Marshal(want)
+		expected := &bytes.Buffer{}
+		err = json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		b := &bytes.Buffer{}
@@ -55,7 +56,7 @@ func TestInsertNewError(t *testing.T) {
 
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	})
 
@@ -68,7 +69,8 @@ func TestInsertNewError(t *testing.T) {
 				Error: "bad request: failed decoding row",
 			}
 		)
-		expected, err := json.Marshal(want)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodGet, "/error", nil)
@@ -82,7 +84,7 @@ func TestInsertNewError(t *testing.T) {
 
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
 	})
 
@@ -98,7 +100,8 @@ func TestInsertNewError(t *testing.T) {
 		)
 		_, err := utils.LoadJSONToStruct("testdata/row.json", row)
 		require.NoError(t, err)
-		expected, err := json.Marshal(want)
+		expected := &bytes.Buffer{}
+		err = json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		b := &bytes.Buffer{}
@@ -120,7 +123,7 @@ func TestInsertNewError(t *testing.T) {
 
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
 	})
 }

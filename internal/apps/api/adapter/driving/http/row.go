@@ -46,14 +46,8 @@ func (h *rowHandler) InsertNewError(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := json.Marshal(row)
-	if err != nil {
-		handleError(h.log, w, err, "failed marshaling row")
-		return
-	}
-
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(res)
+	err = json.NewEncoder(w).Encode(row)
 	if err != nil {
 		handleError(h.log, w, err, "failed writing get all row response to client")
 	}

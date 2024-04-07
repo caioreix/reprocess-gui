@@ -35,14 +35,8 @@ func (h *tableHandler) GetAllTables(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	res, err := json.Marshal(tables)
-	if err != nil {
-		handleError(h.log, w, err, "failed marshaling tables")
-		return
-	}
-
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(res)
+	err = json.NewEncoder(w).Encode(tables)
 	if err != nil {
 		handleError(h.log, w, err, "failed writing get all tables response to client")
 	}
@@ -60,14 +54,8 @@ func (h *tableHandler) GetTableByTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := json.Marshal(table)
-	if err != nil {
-		handleError(h.log, w, err, "failed marshaling table by team")
-		return
-	}
-
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(res)
+	err = json.NewEncoder(w).Encode(table)
 	if err != nil {
 		handleError(h.log, w, err, "failed writing get table by team response to client")
 	}

@@ -44,14 +44,8 @@ func (h *consumerHandler) InsertNewConsumer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	res, err := json.Marshal(consumer)
-	if err != nil {
-		handleError(h.log, w, err, "failed marshaling new consumer")
-		return
-	}
-
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(res)
+	err = json.NewEncoder(w).Encode(consumer)
 	if err != nil {
 		handleError(h.log, w, err, "failed writing new consumer response to client")
 	}
