@@ -41,7 +41,7 @@ func TestInsertNewConsumer(t *testing.T) {
 		err = json.NewEncoder(b).Encode(consumer)
 		require.NoError(t, err)
 
-		req := httptest.NewRequest(http.MethodPost, "/error", b)
+		req := httptest.NewRequest(http.MethodPost, "/consumer", b)
 		w := httptest.NewRecorder()
 
 		serviceMock.
@@ -58,6 +58,7 @@ func TestInsertNewConsumer(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 
 	t.Run("Fail: bad request", func(t *testing.T) {
@@ -73,7 +74,7 @@ func TestInsertNewConsumer(t *testing.T) {
 		err := json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
-		req := httptest.NewRequest(http.MethodGet, "/error", nil)
+		req := httptest.NewRequest(http.MethodGet, "/consumer", nil)
 		w := httptest.NewRecorder()
 
 		handler := handler.NewConsumerHandler(config, logger, serviceMock)
@@ -86,6 +87,7 @@ func TestInsertNewConsumer(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 
 	t.Run("Fail: not found", func(t *testing.T) {
@@ -108,7 +110,7 @@ func TestInsertNewConsumer(t *testing.T) {
 		err = json.NewEncoder(b).Encode(consumer)
 		require.NoError(t, err)
 
-		req := httptest.NewRequest(http.MethodGet, "/error", b)
+		req := httptest.NewRequest(http.MethodGet, "/consumer", b)
 		w := httptest.NewRecorder()
 
 		serviceMock.
@@ -125,6 +127,7 @@ func TestInsertNewConsumer(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 }
 

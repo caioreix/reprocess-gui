@@ -50,6 +50,7 @@ func TestGetTableByTeam(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 }
 
@@ -83,6 +84,7 @@ func TestGetAllTables(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 
 	t.Run("Fail", func(t *testing.T) {
@@ -115,6 +117,7 @@ func TestGetAllTables(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 }
 
