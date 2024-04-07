@@ -40,6 +40,7 @@ func main() {
 		log.Fatal("failed creating mongo connection", []logger.Field{
 			{Key: "error", Value: err},
 		}...)
+		return
 	}
 	defer mongo.Close(ctx)
 
@@ -69,6 +70,7 @@ func main() {
 		log.Fatal("failed creating the router", []logger.Field{
 			{Key: "error", Value: err},
 		}...)
+		return
 	}
 
 	// Graceful shutdown
@@ -84,5 +86,5 @@ func main() {
 	}()
 
 	<-done
-	log.Warn("finished graceful shutdown")
+	log.Warn("Graceful shutting down")
 }

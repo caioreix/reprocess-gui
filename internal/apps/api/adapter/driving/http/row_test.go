@@ -58,6 +58,7 @@ func TestInsertNewError(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 
 	t.Run("Fail: bad request", func(t *testing.T) {
@@ -86,6 +87,7 @@ func TestInsertNewError(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 
 	t.Run("Fail: not found", func(t *testing.T) {
@@ -125,6 +127,7 @@ func TestInsertNewError(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
 	})
 }
 
