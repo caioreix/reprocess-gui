@@ -22,7 +22,8 @@ go.work
 
 *.env
 !example.env
-api-build
+*-build
 .vscode
 __debug_bin*
 debug.json
+cmd/*/config
