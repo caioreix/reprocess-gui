@@ -35,7 +35,7 @@ func main() {
 
 	ctx := context.Background()
 
-	mongo, err := mongodb.New(config)
+	mongo, err := mongodb.New(ctx, config)
 	if err != nil {
 		log.Fatal("failed creating mongo connection", []logger.Field{
 			{Key: "error", Value: err},

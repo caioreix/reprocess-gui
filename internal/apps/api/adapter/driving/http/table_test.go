@@ -22,7 +22,7 @@ import (
 )
 
 func TestGetTableByTeam(t *testing.T) {
-	t.Run("Sucess", func(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
 		var (
 			config, logger, serviceMock = tableSetupTest(t)
 			want                        = &domain.Table{
@@ -34,10 +34,11 @@ func TestGetTableByTeam(t *testing.T) {
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodGet, "/tables/team1", nil)
+		req.SetPathValue("team", "team1")
 		w := httptest.NewRecorder()
 
 		serviceMock.
-			On("GetTableByTeam", mock.AnythingOfType("context.backgroundCtx"), "").
+			On("GetTableByTeam", mock.AnythingOfType("context.backgroundCtx"), "team1").
 			Return(want, nil).Once()
 
 		handler := handler.NewTableHandler(config, logger, serviceMock)
