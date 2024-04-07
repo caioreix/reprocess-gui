@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	configPath := flag.String("cpath", ".", "config path")
+	configPath := flag.String("cpath", "", "config path")
 	flag.Parse()
 
 	config, err := config.New(*configPath)
@@ -24,7 +24,11 @@ func main() {
 		panic(err)
 	}
 
-	log, err := logger.New(config.Log.Level)
+	loggerCfg := logger.Config{
+		Level:       config.Log.Level,
+		Environment: config.Environment,
+	}
+	log, err := loggerCfg.New()
 	if err != nil {
 		panic(err)
 	}
@@ -40,19 +44,27 @@ func main() {
 	defer mongo.Close(ctx)
 
 	tableCollection := mongo.Database(config.Mongo.TableDatabase).Collection(config.Mongo.TableCollection)
-
 	tableRepository := mongodb.NewTableRepository(config, log, tableCollection)
 	tableService := service.NewTableService(config, log, tableRepository)
 	tableHandler := http.NewTableHandler(config, log, tableService)
 
 	rowCollection := mongo.Database(config.Mongo.RowDatabase).Collection(config.Mongo.RowCollection)
-
 	rowRepository := mongodb.NewRowRepository(config, log, rowCollection)
 	rowService := service.NewRowService(config, log, rowRepository)
 	rowHandler := http.NewRowHandler(config, log, rowService)
 
+	consumerCollection := mongo.Database(config.Mongo.ConsumerDatabase).Collection(config.Mongo.ConsumerCollection)
+	consumerRepository := mongodb.NewConsumerRepository(config, log, consumerCollection)
+	consumerService := service.NewConsumerService(config, log, consumerRepository)
+	consumerHandler := http.NewConsumerHandler(config, log, consumerService)
+
+	r := http.Router{
+		TableHandler:    tableHandler,
+		RowHandler:      rowHandler,
+		ConsumerHandler: consumerHandler,
+	}
 	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
-	router, err := http.NewRouter(addr, tableHandler, rowHandler)
+	router, err := r.NewRouter(addr, config.Server.ReadHeaderTimeout)
 	if err != nil {
 		log.Fatal("failed creating the router", []logger.Field{
 			{Key: "error", Value: err},

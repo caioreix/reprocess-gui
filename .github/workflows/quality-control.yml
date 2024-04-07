@@ -6,10 +6,18 @@ on:
 
 env:
   GO_VERSION: '1.22.1'
+  GO111MODULE: on
 
 jobs:
-  quality-control:
-    name: Quality Control
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: morphy2k/revive-action@v2
+
+  sec:
+    name: Security Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,9 +25,34 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: false
-      - name: Lint
-        uses: golangci/golangci-lint-action@v4
+      - run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+      - run: make sec
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
         with:
-          version: v1.54
-      - name: Tests
-        run: make test
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+      - run: make test
+    needs: [lint, sec]
+
+  review:
+    name: Trigger Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GTOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '@coderabbitai review'
+            })
+    needs: [lint, sec, tests]

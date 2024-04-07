@@ -16,13 +16,13 @@ import (
 	"reprocess-gui/internal/logger"
 )
 
-func TestInsertNewError(t *testing.T) {
+func TestInsertNewConsumer(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
 	mt.Run("Sucess", func(t *mtest.T) {
 		var (
-			ctx, config, logger, collection = rowSetupTest(t)
-			row                             = &domain.Row{Status: domain.Pending}
+			ctx, config, logger, collection = consumerSetupTest(t)
+			consumer                        = &domain.Consumer{Team: "channels"}
 		)
 
 		t.AddMockResponses(bson.D{
@@ -31,32 +31,32 @@ func TestInsertNewError(t *testing.T) {
 			{Key: "acknowledged", Value: 1},
 		})
 
-		s := mongodb.NewRowRepository(config, logger, collection)
+		s := mongodb.NewConsumerRepository(config, logger, collection)
 
-		newRow, err := s.InsertNewError(ctx, row)
+		newConsumer, err := s.InsertNewConsumer(ctx, consumer)
 		require.NoError(t, err)
-		require.NotEmpty(t, newRow.ID)
+		require.NotEmpty(t, newConsumer.ID)
 	})
 
 	mt.Run("Fail", func(t *mtest.T) {
 		var (
-			ctx, config, logger, collection = rowSetupTest(t)
-			row                             = &domain.Row{Status: domain.Pending}
+			ctx, config, logger, collection = consumerSetupTest(t)
+			consumer                        = &domain.Consumer{Team: "channels"}
 		)
 
 		t.AddMockResponses(bson.D{
 			{Key: "ok", Value: 0},
 		})
 
-		s := mongodb.NewRowRepository(config, logger, collection)
+		s := mongodb.NewConsumerRepository(config, logger, collection)
 
-		newRow, err := s.InsertNewError(ctx, row)
+		newConsumer, err := s.InsertNewConsumer(ctx, consumer)
 		require.Error(t, err)
-		require.Empty(t, newRow)
+		require.Empty(t, newConsumer)
 	})
 }
 
-func rowSetupTest(t *mtest.T) (context.Context, *config.Config, *logger.Logger, *mongo.Collection) {
+func consumerSetupTest(t *mtest.T) (context.Context, *config.Config, *logger.Logger, *mongo.Collection) {
 	t.Helper()
 
 	var (

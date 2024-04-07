@@ -15,6 +15,7 @@ type tableService struct {
 	repo   port.TableRepository
 }
 
+// NewTableService creates a new instance of tableService.
 func NewTableService(config *config.Config, log *logger.Logger, repo port.TableRepository) *tableService {
 	return &tableService{
 		config: config,
@@ -23,6 +24,7 @@ func NewTableService(config *config.Config, log *logger.Logger, repo port.TableR
 	}
 }
 
+// GetAllTables retrieves all tables from the repository.
 func (s *tableService) GetAllTables(ctx context.Context) ([]*domain.Table, error) {
 	tables, err := s.repo.GetAllTables(ctx)
 	if err != nil {
@@ -32,6 +34,7 @@ func (s *tableService) GetAllTables(ctx context.Context) ([]*domain.Table, error
 	return tables, nil
 }
 
+// GetTableByTeam retrieves a table by team name from the repository.
 func (s *tableService) GetTableByTeam(ctx context.Context, team string) (*domain.Table, error) {
 	table, err := s.repo.GetTableByTeam(ctx, team)
 	if err != nil {

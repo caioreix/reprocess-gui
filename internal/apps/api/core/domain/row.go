@@ -7,11 +7,15 @@ import (
 type status string
 
 const (
-	Pending     status = "pending"
-	Queued      status = "queued"
+	// Pending indicates that the row reprocess is pending.
+	Pending status = "pending"
+	// Queued indicates that the row is queued for processing.
+	Queued status = "queued"
+	// Reprocessed indicates that the row has been reprocessed.
 	Reprocessed status = "reprocessed"
 )
 
+// Row represents the row data.
 type Row struct {
 	ID        string `json:"id" bson:"_id,omitempty"`
 	Error     string `json:"error" bson:"error"`

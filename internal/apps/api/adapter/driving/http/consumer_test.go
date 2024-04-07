@@ -22,34 +22,34 @@ import (
 	"reprocess-gui/internal/utils"
 )
 
-func TestInsertNewError(t *testing.T) {
+func TestInsertNewConsumer(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
-			config, logger, serviceMock = rowSetupTest(t)
-			want                        = &domain.Row{}
-			row                         = &domain.Row{}
+			config, logger, serviceMock = consumerSetupTest(t)
+			want                        = &domain.Consumer{}
+			consumer                    = &domain.Consumer{}
 		)
-		_, err := utils.LoadJSONToStruct("testdata/row.json", want)
+		_, err := utils.LoadJSONToStruct("testdata/consumer.json", want)
 		require.NoError(t, err)
-		_, err = utils.LoadJSONToStruct("testdata/row.json", row)
+		_, err = utils.LoadJSONToStruct("testdata/consumer.json", consumer)
 		require.NoError(t, err)
 		expected := &bytes.Buffer{}
 		err = json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		b := &bytes.Buffer{}
-		err = json.NewEncoder(b).Encode(row)
+		err = json.NewEncoder(b).Encode(consumer)
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodPost, "/error", b)
 		w := httptest.NewRecorder()
 
 		serviceMock.
-			On("InsertNewError", mock.AnythingOfType("context.backgroundCtx"), row).
+			On("InsertNewConsumer", mock.AnythingOfType("context.backgroundCtx"), consumer).
 			Return(want, nil).Once()
 
-		handler := handler.NewRowHandler(config, logger, serviceMock)
-		handler.InsertNewError(w, req)
+		handler := handler.NewConsumerHandler(config, logger, serviceMock)
+		handler.InsertNewConsumer(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()
@@ -62,11 +62,11 @@ func TestInsertNewError(t *testing.T) {
 
 	t.Run("Fail: bad request", func(t *testing.T) {
 		var (
-			config, logger, serviceMock = rowSetupTest(t)
+			config, logger, serviceMock = consumerSetupTest(t)
 			want                        = struct {
 				Error string `json:"error"`
 			}{
-				Error: "bad request: failed decoding row",
+				Error: "bad request: failed decoding consumer request body",
 			}
 		)
 		expected := &bytes.Buffer{}
@@ -76,8 +76,8 @@ func TestInsertNewError(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/error", nil)
 		w := httptest.NewRecorder()
 
-		handler := handler.NewRowHandler(config, logger, serviceMock)
-		handler.InsertNewError(w, req)
+		handler := handler.NewConsumerHandler(config, logger, serviceMock)
+		handler.InsertNewConsumer(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()
@@ -90,33 +90,33 @@ func TestInsertNewError(t *testing.T) {
 
 	t.Run("Fail: not found", func(t *testing.T) {
 		var (
-			config, logger, serviceMock = rowSetupTest(t)
+			config, logger, serviceMock = consumerSetupTest(t)
 			want                        = struct {
 				Error string `json:"error"`
 			}{
-				Error: "empty response value: failed getting row",
+				Error: "empty response value: failed inserting new consumer",
 			}
-			row = &domain.Row{}
+			consumer = &domain.Consumer{}
 		)
-		_, err := utils.LoadJSONToStruct("testdata/row.json", row)
+		_, err := utils.LoadJSONToStruct("testdata/consumer.json", consumer)
 		require.NoError(t, err)
 		expected := &bytes.Buffer{}
 		err = json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		b := &bytes.Buffer{}
-		err = json.NewEncoder(b).Encode(row)
+		err = json.NewEncoder(b).Encode(consumer)
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodGet, "/error", b)
 		w := httptest.NewRecorder()
 
 		serviceMock.
-			On("InsertNewError", mock.AnythingOfType("context.backgroundCtx"), row).
+			On("InsertNewConsumer", mock.AnythingOfType("context.backgroundCtx"), consumer).
 			Return(nil, errors.ErrEmptyResponse).Once()
 
-		handler := handler.NewRowHandler(config, logger, serviceMock)
-		handler.InsertNewError(w, req)
+		handler := handler.NewConsumerHandler(config, logger, serviceMock)
+		handler.InsertNewConsumer(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()
@@ -128,12 +128,12 @@ func TestInsertNewError(t *testing.T) {
 	})
 }
 
-func rowSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.RowService) {
+func consumerSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.ConsumerService) {
 	t.Helper()
 
 	var (
 		config      = &config.Config{}
-		serviceMock = portmock.NewRowService(t)
+		serviceMock = portmock.NewConsumerService(t)
 		loggerCfg   = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 

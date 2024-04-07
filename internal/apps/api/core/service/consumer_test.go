@@ -16,50 +16,50 @@ import (
 	"reprocess-gui/internal/logger"
 )
 
-func TestInsertNewError(t *testing.T) {
+func TestInsertNewConsumer(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
-			ctx, config, logger, repoMock = rowSetupTest(t)
-			row                           = &domain.Row{}
-			want                          = &domain.Row{}
+			ctx, config, logger, repoMock = consumerSetupTest(t)
+			consumer                      = &domain.Consumer{}
+			want                          = &domain.Consumer{}
 		)
 
 		repoMock.
-			On("InsertNewError", ctx, row).
+			On("InsertNewConsumer", ctx, consumer).
 			Return(want, nil).Once()
 
-		s := service.NewRowService(config, logger, repoMock)
+		s := service.NewConsumerService(config, logger, repoMock)
 
-		got, err := s.InsertNewError(ctx, row)
+		got, err := s.InsertNewConsumer(ctx, consumer)
 		assert.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
 
 	t.Run("Fail", func(t *testing.T) {
 		var (
-			ctx, config, logger, repoMock = rowSetupTest(t)
-			row                           = &domain.Row{}
+			ctx, config, logger, repoMock = consumerSetupTest(t)
+			consumer                      = &domain.Consumer{}
 		)
 
 		repoMock.
-			On("InsertNewError", ctx, row).
+			On("InsertNewConsumer", ctx, consumer).
 			Return(nil, errors.ErrEmptyResponse).Once()
 
-		s := service.NewRowService(config, logger, repoMock)
+		s := service.NewConsumerService(config, logger, repoMock)
 
-		got, err := s.InsertNewError(ctx, row)
+		got, err := s.InsertNewConsumer(ctx, consumer)
 		assert.ErrorIs(t, err, errors.ErrEmptyResponse)
 		assert.Nil(t, got)
 	})
 }
 
-func rowSetupTest(t *testing.T) (context.Context, *config.Config, *logger.Logger, *portmock.RowRepository) {
+func consumerSetupTest(t *testing.T) (context.Context, *config.Config, *logger.Logger, *portmock.ConsumerRepository) {
 	t.Helper()
 
 	var (
 		ctx       = context.TODO()
 		config    = &config.Config{}
-		repoMock  = portmock.NewRowRepository(t)
+		repoMock  = portmock.NewConsumerRepository(t)
 		loggerCfg = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 

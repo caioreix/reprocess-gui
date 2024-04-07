@@ -17,6 +17,7 @@ type rowRepository struct {
 	collection *mongo.Collection
 }
 
+// NewRowRepository creates a new instance of rowRepository.
 func NewRowRepository(config *config.Config, log *logger.Logger, collection *mongo.Collection) *rowRepository {
 	return &rowRepository{
 		config:     config,
@@ -25,6 +26,7 @@ func NewRowRepository(config *config.Config, log *logger.Logger, collection *mon
 	}
 }
 
+// InsertNewError inserts a new error row into the MongoDB collection.
 func (r *rowRepository) InsertNewError(ctx context.Context, row *domain.Row) (*domain.Row, error) {
 	result, err := r.collection.InsertOne(ctx, row)
 	if err != nil {

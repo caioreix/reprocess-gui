@@ -16,6 +16,7 @@ type rowService struct {
 	repo   port.RowRepository
 }
 
+// NewRowService creates a new instance of rowService.
 func NewRowService(config *config.Config, log *logger.Logger, repo port.RowRepository) *rowService {
 	return &rowService{
 		config: config,
@@ -24,6 +25,7 @@ func NewRowService(config *config.Config, log *logger.Logger, repo port.RowRepos
 	}
 }
 
+// InsertNewError inserts a new error row into the repository.
 func (s *rowService) InsertNewError(ctx context.Context, row *domain.Row) (*domain.Row, error) {
 	row.ID = ""
 	row.CreatedAT = time.Now()

@@ -1,6 +1,7 @@
 package http_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/domain"
 	portmock "reprocess-gui/internal/apps/api/core/port/mocks"
+	"reprocess-gui/internal/common"
 	"reprocess-gui/internal/errors"
 	"reprocess-gui/internal/logger"
 )
@@ -27,7 +29,8 @@ func TestGetTableByTeam(t *testing.T) {
 				Name: "table1", Team: "team1", Default: true,
 			}
 		)
-		expected, err := json.Marshal(want)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodGet, "/tables/team1", nil)
@@ -45,7 +48,7 @@ func TestGetTableByTeam(t *testing.T) {
 
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	})
 }
@@ -59,7 +62,8 @@ func TestGetAllTables(t *testing.T) {
 				{Name: "table2"},
 			}
 		)
-		expected, err := json.Marshal(want)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodGet, "/tables", nil)
@@ -77,7 +81,7 @@ func TestGetAllTables(t *testing.T) {
 
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
 	})
 
@@ -90,7 +94,8 @@ func TestGetAllTables(t *testing.T) {
 				Error: "empty response value: failed getting tables",
 			}
 		)
-		expected, err := json.Marshal(want)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
 		require.NoError(t, err)
 
 		req := httptest.NewRequest(http.MethodGet, "/tables", nil)
@@ -108,7 +113,7 @@ func TestGetAllTables(t *testing.T) {
 
 		data, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, string(expected), string(data))
+		assert.Equal(t, expected.String(), string(data))
 		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
 	})
 }
@@ -119,9 +124,10 @@ func tableSetupTest(t *testing.T) (*config.Config, *logger.Logger, *portmock.Tab
 	var (
 		config      = &config.Config{}
 		serviceMock = portmock.NewTableService(t)
+		loggerCfg   = logger.Config{Level: "debug", Environment: common.EnvironmentTest}
 	)
 
-	logger, err := logger.New("debug")
+	logger, err := loggerCfg.New()
 	require.NoError(t, err)
 
 	return config, logger, serviceMock

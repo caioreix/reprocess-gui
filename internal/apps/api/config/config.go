@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config represents the configuration structure containing all the project settings.
 type Config struct {
 	Environment string `default:"dev"`
 	Server      Server
@@ -14,11 +15,14 @@ type Config struct {
 	Log         Log
 }
 
+// Server represents the server configuration.
 type Server struct {
-	Host string `default:"localhost"`
-	Port int    `default:"8080"`
+	Host              string        `default:"localhost"`
+	Port              int           `default:"8080"`
+	ReadHeaderTimeout time.Duration `default:"10s"`
 }
 
+// Mongo represents the MongoDB configuration.
 type Mongo struct {
 	URI               string        `required:"true"`
 	ConnectionTimeout time.Duration `default:"10s"`
@@ -29,16 +33,24 @@ type Mongo struct {
 
 	RowDatabase   string `required:"true"`
 	RowCollection string `required:"true"`
+
+	ConsumerDatabase   string `required:"true"`
+	ConsumerCollection string `required:"true"`
 }
 
+// Log represents the logging configuration.
 type Log struct {
 	Level string `default:"debug"`
 }
 
+// New creates a new Config instance by loading configuration settings from the specified path.
+// It loads settings from environment variables and configuration files.
 func New(path string) (*Config, error) {
-	err := godotenv.Load(path)
-	if err != nil {
-		return nil, err
+	if path != "" {
+		err := godotenv.Load(path)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	config := &Config{}
@@ -48,7 +60,7 @@ func New(path string) (*Config, error) {
 		ENVPrefix: "API",
 	}
 
-	err = configor.New(settings).Load(config)
+	err := configor.New(settings).Load(config)
 	if err != nil {
 		return nil, err
 	}

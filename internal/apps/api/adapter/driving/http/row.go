@@ -18,6 +18,7 @@ type rowHandler struct {
 	svc    port.RowService
 }
 
+// NewRowHandler creates a new instance of rowHandler.
 func NewRowHandler(config *config.Config, log *logger.Logger, svc port.RowService) *rowHandler {
 	return &rowHandler{
 		config: config,
@@ -26,6 +27,9 @@ func NewRowHandler(config *config.Config, log *logger.Logger, svc port.RowServic
 	}
 }
 
+// InsertNewError handles HTTP POST requests to insert a new row.
+// It decodes the JSON request body into a domain.Row, then inserts it into the database.
+// If successful, it responds with the inserted row in JSON format.
 func (h *rowHandler) InsertNewError(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -42,14 +46,8 @@ func (h *rowHandler) InsertNewError(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := json.Marshal(row)
-	if err != nil {
-		handleError(h.log, w, err, "failed marshaling row")
-		return
-	}
-
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(res)
+	err = json.NewEncoder(w).Encode(row)
 	if err != nil {
 		handleError(h.log, w, err, "failed writing get all row response to client")
 	}

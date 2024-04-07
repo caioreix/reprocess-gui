@@ -17,6 +17,7 @@ type tableRepository struct {
 	collection *mongo.Collection
 }
 
+// NewTableRepository creates a new instance of tableRepository.
 func NewTableRepository(config *config.Config, log *logger.Logger, collection *mongo.Collection) *tableRepository {
 	return &tableRepository{
 		config:     config,
@@ -25,6 +26,7 @@ func NewTableRepository(config *config.Config, log *logger.Logger, collection *m
 	}
 }
 
+// GetAllTables retrieves all tables from the MongoDB collection.
 func (r *tableRepository) GetAllTables(ctx context.Context) ([]*domain.Table, error) {
 	cur, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -49,6 +51,7 @@ func (r *tableRepository) GetAllTables(ctx context.Context) ([]*domain.Table, er
 	return tables, nil
 }
 
+// GetTableByTeam retrieves a table based on the team name from the MongoDB collection.
 func (r *tableRepository) GetTableByTeam(ctx context.Context, team string) (*domain.Table, error) {
 	res := r.collection.FindOne(ctx, bson.M{"team": team})
 	if err := res.Err(); err != nil {

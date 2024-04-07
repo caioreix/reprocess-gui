@@ -5,32 +5,20 @@ import (
 	"fmt"
 	"net/http"
 
+	"reprocess-gui/internal/apps/api/core/domain"
 	"reprocess-gui/internal/errors"
 	"reprocess-gui/internal/logger"
 )
 
-func errorParse(err error, message string) (int, []byte) {
+func errorParse(err error, message string) (int, domain.Error) {
 	switch {
 	case errors.Is(err, errors.ErrEmptyResponse):
-		return errResponse(http.StatusNotFound, fmt.Sprintf("%s: %s", errors.ErrEmptyResponse.Error(), message))
+		return http.StatusNotFound, domain.Error{Error: fmt.Sprintf("%s: %s", errors.ErrEmptyResponse.Error(), message)}
 	case errors.Is(err, errors.ErrBadRequest):
-		return errResponse(http.StatusBadRequest, fmt.Sprintf("%s: %s", errors.ErrBadRequest.Error(), message))
+		return http.StatusBadRequest, domain.Error{Error: fmt.Sprintf("%s: %s", errors.ErrBadRequest.Error(), message)}
 	}
 
-	return errResponse(http.StatusInternalServerError, errors.ErrInternalServerError.Error())
-}
-
-func errResponse(status int, message string) (int, []byte) {
-	res := struct {
-		Error string `json:"error"`
-	}{message}
-
-	body, err := json.Marshal(res)
-	if err != nil {
-		return http.StatusInternalServerError, []byte(fmt.Sprintf(`{error: "%s"}`, errors.ErrInternalServerError.Error()))
-	}
-
-	return status, body
+	return http.StatusInternalServerError, domain.Error{Error: errors.ErrInternalServerError.Error()}
 }
 
 func handleError(log *logger.Logger, w http.ResponseWriter, err error, message string) {
@@ -38,7 +26,7 @@ func handleError(log *logger.Logger, w http.ResponseWriter, err error, message s
 	log.Skip(1).Error(err, message)
 	status, res := errorParse(err, message)
 	w.WriteHeader(status)
-	_, err = w.Write(res)
+	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
 		log.Error(err, "failed writing error response to client")
 	}

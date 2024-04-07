@@ -8,7 +8,7 @@ import (
 
 func TestNewError(t *testing.T) {
 	message := "test error"
-	err := new(message)
+	err := newErr(message)
 
 	require.Error(t, err)
 	require.Equal(t, message, err.Error())
