@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -38,7 +37,7 @@ func (h *consumerHandler) InsertNewConsumer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	consumer, err = h.svc.InsertNewConsumer(context.Background(), consumer)
+	consumer, err = h.svc.InsertNewConsumer(r.Context(), consumer)
 	if err != nil {
 		handleError(h.log, w, err, "failed inserting new consumer")
 		return
