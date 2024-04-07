@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -40,7 +39,7 @@ func (h *rowHandler) InsertNewError(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	row, err = h.svc.InsertNewError(context.Background(), row)
+	row, err = h.svc.InsertNewError(r.Context(), row)
 	if err != nil {
 		handleError(h.log, w, err, "failed getting row")
 		return
