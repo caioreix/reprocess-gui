@@ -1,7 +1,7 @@
 version: "3"
 services:
   kafka:
-    image: bitnami/kafka:latest
+    image: bitnami/kafka:3.7.0
     restart: on-failure
     ports:
       - 9092:9092
@@ -16,7 +16,7 @@ services:
       - zookeeper
 
   zookeeper:
-    image: bitnami/zookeeper:latest
+    image: bitnami/zookeeper:3.9.2
     ports:
       - 2181:2181
     volumes:
@@ -35,7 +35,7 @@ services:
     restart: always
     volumes:
       - "kafka_data:/bitnami"
-      - "kafa_configs:/opt/bitnami/kafka/config"
+      - "kafka_configs:/opt/bitnami/kafka/config"
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
@@ -46,7 +46,7 @@ volumes:
     driver: local
   kafka_data:
     driver: local
-  kafa_configs:
+  kafka_configs:
     driver: local
     # driver_opts:
     #   type: none

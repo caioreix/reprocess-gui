@@ -5,7 +5,7 @@ local:
 	@go run ./cmd/api/... -cpath $(CPATH)
 
 watch-local:
-	@reflex -r "\.go|.env$$" -s -- sh -c "go run ./cmd/api/... -cpath $(CPATH)"
+	@reflex -r "\.go|.env$$" -s -- sh -c "go build -o ./cmd/api/api-build ./cmd/api/... && ./cmd/api/api-build -cpath $(CPATH)"
 
 compose-start: docker-build
 	@cd ./cmd/api && $(MAKE) start

@@ -19,7 +19,11 @@ func main() {
 		panic(err)
 	}
 
-	log, err := logger.New(config.Log.Level)
+	loggerCfg := logger.Config{
+		Level:       config.Log.Level,
+		Environment: config.Environment,
+	}
+	log, err := loggerCfg.New()
 	if err != nil {
 		panic(err)
 	}
@@ -32,6 +36,7 @@ func main() {
 		log.Info("running...")
 	}()
 
+	log.Info("Waiting for shutdown signal...")
 	<-done
-	log.Warn("finished graceful shutdown")
+	log.Warn("Finished graceful shutdown")
 }
