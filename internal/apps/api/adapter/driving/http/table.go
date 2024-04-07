@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -26,10 +25,10 @@ func NewTableHandler(config *config.Config, log *logger.Logger, svc port.TableSe
 }
 
 // GetAllTables retrieves all tables and writes them as JSON to the response.
-func (h *tableHandler) GetAllTables(w http.ResponseWriter, _ *http.Request) {
+func (h *tableHandler) GetAllTables(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	tables, err := h.svc.GetAllTables(context.Background())
+	tables, err := h.svc.GetAllTables(r.Context())
 	if err != nil {
 		handleError(h.log, w, err, "failed getting tables")
 		return
@@ -48,7 +47,7 @@ func (h *tableHandler) GetTableByTeam(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	table, err := h.svc.GetTableByTeam(context.Background(), team)
+	table, err := h.svc.GetTableByTeam(r.Context(), team)
 	if err != nil {
 		handleError(h.log, w, err, "failed getting table by team")
 		return
