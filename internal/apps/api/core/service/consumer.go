@@ -8,6 +8,7 @@ import (
 	"reprocess-gui/internal/apps/api/core/domain"
 	"reprocess-gui/internal/apps/api/core/port"
 	"reprocess-gui/internal/logger"
+	"reprocess-gui/internal/utils"
 )
 
 type consumerService struct {
@@ -23,6 +24,46 @@ func NewConsumerService(config *config.Config, log *logger.Logger, repo port.Con
 		log:    log,
 		repo:   repo,
 	}
+}
+
+// GetAllConsumers retrieves all consumers from the repository.
+func (s *consumerService) GetAllConsumers(ctx context.Context, pageToken string, limit int) (*domain.PagedConsumer, error) {
+	pagination := &utils.PaginationToken{}
+	if pageToken != "" {
+		err := utils.ParsePaginationToken(pageToken, s.config.JWT.Secret, pagination)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if limit > 0 {
+		pagination.Limit = limit
+	}
+
+	consumers, err := s.repo.GetAllConsumers(ctx, pagination)
+	if err != nil {
+		return nil, err
+	}
+
+	if pagination.Limit >= len(consumers) {
+		return &domain.PagedConsumer{
+			Consumers:  consumers,
+			Pagination: &utils.Pagination{},
+		}, nil
+	}
+	consumers = consumers[:len(consumers)-1]
+
+	pagination.Offset = consumers[len(consumers)-1].ID
+	token, err := utils.GeneratePaginationToken(pagination, s.config.JWT.Secret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.PagedConsumer{
+		Consumers: consumers,
+		Pagination: &utils.Pagination{
+			NextPage: token,
+		},
+	}, nil
 }
 
 // InsertNewConsumer inserts a new consumer into the repository.

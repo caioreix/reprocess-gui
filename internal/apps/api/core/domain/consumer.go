@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"reprocess-gui/internal/utils"
+)
 
 // Consumer represents the consumer data.
 type Consumer struct {
@@ -14,4 +18,10 @@ type Consumer struct {
 
 	CreatedAT time.Time `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAT time.Time `json:"updated_at" bson:"updated_at"`
+}
+
+// PagedConsumer represents the consumer with token pagination data.
+type PagedConsumer struct {
+	Consumers  []*Consumer       `json:"consumers"`
+	Pagination *utils.Pagination `json:"pagination" bson:"-"`
 }

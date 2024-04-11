@@ -26,6 +26,7 @@ func (r *Router) NewRouter(addr string, readHeaderTimeout time.Duration) (*route
 
 	mux.HandleFunc("POST /error", r.RowHandler.InsertNewError)
 
+	mux.HandleFunc("GET /consumers", r.ConsumerHandler.GetAllConsumers)
 	mux.HandleFunc("POST /consumer", r.ConsumerHandler.InsertNewConsumer)
 
 	return &router{

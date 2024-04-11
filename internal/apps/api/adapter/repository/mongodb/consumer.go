@@ -3,12 +3,15 @@ package mongodb
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/domain"
 	"reprocess-gui/internal/logger"
+	"reprocess-gui/internal/utils"
 )
 
 type consumerRepository struct {
@@ -24,6 +27,41 @@ func NewConsumerRepository(config *config.Config, log *logger.Logger, collection
 		log:        log,
 		collection: collection,
 	}
+}
+
+// GetAllConsumers retrieves all consumers from the MongoDB collection.
+func (r *consumerRepository) GetAllConsumers(ctx context.Context, pageToken *utils.PaginationToken) ([]*domain.Consumer, error) {
+	var filter any = bson.D{}
+	opts := options.Find().SetLimit(int64(pageToken.Limit + 1))
+	if pageToken.Offset != "" {
+		id, err := primitive.ObjectIDFromHex(pageToken.Offset)
+		if err != nil {
+			return nil, err
+		}
+		filter = bson.M{"_id": bson.M{"$gt": id}}
+	}
+
+	cur, err := r.collection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	consumers := []*domain.Consumer{}
+	for cur.Next(ctx) {
+		consumer := &domain.Consumer{}
+		err := cur.Decode(consumer)
+		if err != nil {
+			return nil, err
+		}
+
+		consumers = append(consumers, consumer)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+
+	return consumers, nil
 }
 
 // InsertNewConsumer inserts a new consumer into the MongoDB collection.

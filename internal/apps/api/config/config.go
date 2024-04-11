@@ -13,6 +13,7 @@ type Config struct {
 	Server      Server
 	Mongo       Mongo
 	Log         Log
+	JWT         JWT
 }
 
 // Server represents the server configuration.
@@ -36,6 +37,11 @@ type Mongo struct {
 
 	ConsumerDatabase   string `required:"true"`
 	ConsumerCollection string `required:"true"`
+}
+
+// JWT represents the jwt configuration.
+type JWT struct {
+	Secret string `required:"true"`
 }
 
 // Log represents the logging configuration.

@@ -4,8 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
 
@@ -14,7 +16,46 @@ import (
 	"reprocess-gui/internal/apps/api/core/domain"
 	"reprocess-gui/internal/common"
 	"reprocess-gui/internal/logger"
+	"reprocess-gui/internal/utils"
 )
+
+func TestGetAllConsumers(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+
+	mt.Run("Success", func(mt *mtest.T) {
+		ctx, config, log, collection := consumerSetupTest(mt)
+		want := []*domain.Consumer{
+			{Name: "consumer1", Type: "kafka"},
+			{Name: "consumer2"},
+		}
+		pageToken := &utils.PaginationToken{}
+
+		wantConsumers := []primitive.D{}
+		for i, c := range want {
+			identifier := mtest.NextBatch
+			if i == 0 {
+				identifier = mtest.FirstBatch
+			}
+			wantConsumers = append(wantConsumers, mtest.CreateCursorResponse(1, "foo.bar", identifier, bson.D{
+				{Key: "_id", Value: primitive.NewObjectID()},
+				{Key: "name", Value: c.Name},
+				{Key: "type", Value: c.Type},
+			}))
+		}
+		wantConsumers = append(wantConsumers, mtest.CreateCursorResponse(0, "foo.bar", mtest.NextBatch))
+		mt.AddMockResponses(wantConsumers...)
+
+		repo := mongodb.NewConsumerRepository(config, log, collection)
+		consumers, err := repo.GetAllConsumers(ctx, pageToken)
+
+		assert.Nil(mt, err)
+		for _, v := range consumers {
+			assert.NotEmpty(mt, v.ID)
+			v.ID = ""
+		}
+		assert.Equal(mt, want, consumers)
+	})
+}
 
 func TestInsertNewConsumer(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
