@@ -11,6 +11,7 @@ import (
 type ConsumerRepository interface {
 	GetAllConsumers(ctx context.Context, pageToken *utils.PaginationToken) (pagedConsumer []*domain.Consumer, err error)
 	InsertNewConsumer(ctx context.Context, consumer *domain.Consumer) (*domain.Consumer, error)
+	GetTotalCount(ctx context.Context) (int, error)
 }
 
 // ConsumerService provides methods for performing operations related to consumers.

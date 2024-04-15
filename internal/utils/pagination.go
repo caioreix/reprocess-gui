@@ -4,12 +4,14 @@ package utils
 type Pagination struct {
 	TotalRecords int    `json:"total_records,omitempty"`
 	NextPage     string `json:"next_page"`
+	PrevPage     string `json:"prev_page"`
 }
 
 // PaginationToken represents a pagination token.
 type PaginationToken struct {
-	Offset string `json:"offset"`
-	Limit  int    `json:"limit"`
+	Offset   string `json:"offset"`
+	Limit    int    `json:"limit"`
+	Reversed bool   `json:"reversed"`
 }
 
 // GeneratePaginationToken generates a JWT pagination token for the provided object and key.

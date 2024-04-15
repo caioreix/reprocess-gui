@@ -27,42 +27,37 @@ func NewConsumerService(config *config.Config, log *logger.Logger, repo port.Con
 }
 
 // GetAllConsumers retrieves all consumers from the repository.
-func (s *consumerService) GetAllConsumers(ctx context.Context, pageToken string, limit int) (*domain.PagedConsumer, error) {
-	pagination := &utils.PaginationToken{}
-	if pageToken != "" {
-		err := utils.ParsePaginationToken(pageToken, s.config.JWT.Secret, pagination)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if limit > 0 {
-		pagination.Limit = limit
-	}
-
-	consumers, err := s.repo.GetAllConsumers(ctx, pagination)
+func (s *consumerService) GetAllConsumers(ctx context.Context, token string, limit int) (*domain.PagedConsumer, error) {
+	pageToken, pagination, err := s.preparePagination(token, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	if pagination.Limit >= len(consumers) {
-		return &domain.PagedConsumer{
-			Consumers:  consumers,
-			Pagination: &utils.Pagination{},
-		}, nil
+	consumers, err := s.repo.GetAllConsumers(ctx, pageToken)
+	if err != nil {
+		return nil, err
 	}
-	consumers = consumers[:len(consumers)-1]
 
-	pagination.Offset = consumers[len(consumers)-1].ID
-	token, err := utils.GeneratePaginationToken(pagination, s.config.JWT.Secret)
+	pagination.TotalRecords, err = s.repo.GetTotalCount(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if token != "" {
+		pagination.PrevPage, consumers, err = s.generatePrevPageToken(pageToken, consumers)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	pagination.NextPage, consumers, err = s.generateNextPageToken(pageToken, consumers)
 	if err != nil {
 		return nil, err
 	}
 
 	return &domain.PagedConsumer{
-		Consumers: consumers,
-		Pagination: &utils.Pagination{
-			NextPage: token,
-		},
+		Consumers:  consumers,
+		Pagination: pagination,
 	}, nil
 }
 
@@ -78,4 +73,64 @@ func (s *consumerService) InsertNewConsumer(ctx context.Context, consumer *domai
 	}
 
 	return consumer, nil
+}
+
+func (s *consumerService) preparePagination(token string, limit int) (*utils.PaginationToken, *utils.Pagination, error) {
+	pageToken := &utils.PaginationToken{}
+	pagination := &utils.Pagination{}
+
+	if token != "" {
+		err := utils.ParsePaginationToken(token, s.config.JWT.Secret, pageToken)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	if limit > 0 {
+		pageToken.Limit = limit
+	}
+
+	return pageToken, pagination, nil
+}
+
+func (s *consumerService) generatePrevPageToken(pageToken *utils.PaginationToken, consumers []*domain.Consumer) (string, []*domain.Consumer, error) {
+	pt := *pageToken
+
+	if pt.Reversed {
+		if len(consumers) <= pt.Limit {
+			return "", consumers, nil
+		}
+		consumers = consumers[1:]
+	}
+
+	pt.Offset = consumers[0].ID
+	pt.Reversed = true
+
+	token, err := utils.GeneratePaginationToken(&pt, s.config.JWT.Secret)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return token, consumers, nil
+}
+
+func (s *consumerService) generateNextPageToken(pageToken *utils.PaginationToken, consumers []*domain.Consumer) (string, []*domain.Consumer, error) {
+	pt := *pageToken
+
+	if !pt.Reversed {
+		if len(consumers) <= pt.Limit {
+			return "", consumers, nil
+		}
+		consumers = consumers[:len(consumers)-1]
+	}
+
+	pt.Offset = consumers[len(consumers)-1].ID
+	pt.Reversed = false
+
+	token, err := utils.GeneratePaginationToken(&pt, s.config.JWT.Secret)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return token, consumers, nil
 }

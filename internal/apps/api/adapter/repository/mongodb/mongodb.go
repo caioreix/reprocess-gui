@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -39,4 +40,16 @@ func New(ctx context.Context, config *config.Config) (*db, error) {
 // Close disconnects the MongoDB client gracefully.
 func (db *db) Close(ctx context.Context) error {
 	return db.Disconnect(ctx)
+}
+
+func GetTotalCount(ctx context.Context, coll *mongo.Collection) (int, error) {
+	sr := coll.Database().RunCommand(ctx, bson.M{"collStats": coll.Name()})
+	result := struct {
+		Count int
+	}{}
+	err := sr.Decode(&result)
+	if err != nil {
+		return 0, err
+	}
+	return result.Count, nil
 }

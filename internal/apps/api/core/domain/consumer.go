@@ -15,6 +15,8 @@ type Consumer struct {
 	Team       string `json:"team" bson:"team"`
 	Target     string `json:"target" bson:"target"`
 	TargetType string `json:"target_type" bson:"target_type"`
+	ErrorPath  string `json:"error_path" bson:"error_path"`
+	RowTTL     int    `json:"row_ttl" bson:"row_ttl"`
 
 	CreatedAT time.Time `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAT time.Time `json:"updated_at" bson:"updated_at"`
