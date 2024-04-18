@@ -17,7 +17,7 @@ import (
 	"reprocess-gui/internal/utils"
 )
 
-func TestGetAllConsumers(t *testing.T) {
+func TestGetPagedConsumers(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			ctx, config, logger, repoMock = consumerSetupTest(t)
@@ -25,27 +25,31 @@ func TestGetAllConsumers(t *testing.T) {
 				{Name: "consumer1", Type: "kafka"},
 				{Name: "consumer2"},
 			}
-			limit           = 5
+			limit           = 2
 			parsedPageToken = &utils.PaginationToken{
-				Offset: "1234",
-				Limit:  limit,
+				Offset:   "",
+				Limit:    limit,
+				Reversed: false,
 			}
 		)
-		pageToken, err := utils.GeneratePaginationToken(parsedPageToken, "")
-		require.NoError(t, err)
 
 		want := &domain.PagedConsumer{
-			Consumers:  consumers,
-			Pagination: &utils.Pagination{},
+			Consumers: consumers,
+			Pagination: &utils.Pagination{
+				TotalRecords: 5,
+			},
 		}
 
 		repoMock.
-			On("GetAllConsumers", ctx, parsedPageToken).
+			On("GetPagedConsumers", ctx, parsedPageToken.Offset, parsedPageToken.Limit+1, parsedPageToken.Reversed).
 			Return(consumers, nil).Once()
+		repoMock.
+			On("GetTotalCount", ctx).
+			Return(5, nil).Once()
 
 		s := service.NewConsumerService(config, logger, repoMock)
 
-		got, err := s.GetAllConsumers(ctx, pageToken, limit)
+		got, err := s.GetPagedConsumers(ctx, "", limit)
 		assert.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -57,12 +61,12 @@ func TestGetAllConsumers(t *testing.T) {
 				{Name: "consumer1", Type: "kafka"},
 				{Name: "consumer2"},
 				{Name: "consumer3"},
-				{Name: "consumer3"},
 			}
 			limit           = 2
 			parsedPageToken = &utils.PaginationToken{
-				Offset: "1234",
-				Limit:  limit,
+				Offset:   "",
+				Limit:    limit,
+				Reversed: false,
 			}
 		)
 		pageToken, err := utils.GeneratePaginationToken(parsedPageToken, "")
@@ -71,17 +75,21 @@ func TestGetAllConsumers(t *testing.T) {
 		want := &domain.PagedConsumer{
 			Consumers: consumers[:len(consumers)-1],
 			Pagination: &utils.Pagination{
-				NextPage: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsaW1pdCI6Miwib2Zmc2V0IjoiIn0.sdqbZSXkM50rqPp157jMFDN4biRrv2CyfDDla9n2SoU",
+				NextPage:     pageToken,
+				TotalRecords: 5,
 			},
 		}
 
 		repoMock.
-			On("GetAllConsumers", ctx, parsedPageToken).
+			On("GetPagedConsumers", ctx, parsedPageToken.Offset, parsedPageToken.Limit+1, parsedPageToken.Reversed).
 			Return(consumers, nil).Once()
+		repoMock.
+			On("GetTotalCount", ctx).
+			Return(5, nil).Once()
 
 		s := service.NewConsumerService(config, logger, repoMock)
 
-		got, err := s.GetAllConsumers(ctx, pageToken, limit)
+		got, err := s.GetPagedConsumers(ctx, "", limit)
 		assert.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -95,12 +103,12 @@ func TestGetAllConsumers(t *testing.T) {
 		)
 
 		repoMock.
-			On("GetAllConsumers", ctx, parsedPageToken).
+			On("GetPagedConsumers", ctx, parsedPageToken.Offset, parsedPageToken.Limit+1, parsedPageToken.Reversed).
 			Return(nil, errors.ErrEmptyResponse).Once()
 
 		s := service.NewConsumerService(config, logger, repoMock)
 
-		got, err := s.GetAllConsumers(ctx, pageToken, limit)
+		got, err := s.GetPagedConsumers(ctx, pageToken, limit)
 		assert.ErrorIs(t, err, errors.ErrEmptyResponse)
 		assert.Nil(t, got)
 	})

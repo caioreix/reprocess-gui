@@ -22,6 +22,11 @@ type Consumer struct {
 	UpdatedAT time.Time `json:"updated_at" bson:"updated_at"`
 }
 
+// GetOffset return the table offset to make token pagination
+func (c *Consumer) GetOffset() string {
+	return c.ID
+}
+
 // PagedConsumer represents the consumer with token pagination data.
 type PagedConsumer struct {
 	Consumers  []*Consumer       `json:"consumers"`

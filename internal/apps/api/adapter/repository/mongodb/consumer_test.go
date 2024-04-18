@@ -16,10 +16,9 @@ import (
 	"reprocess-gui/internal/apps/api/core/domain"
 	"reprocess-gui/internal/common"
 	"reprocess-gui/internal/logger"
-	"reprocess-gui/internal/utils"
 )
 
-func TestGetAllConsumers(t *testing.T) {
+func TestGetPagedConsumers(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
 	mt.Run("Success", func(mt *mtest.T) {
@@ -28,7 +27,9 @@ func TestGetAllConsumers(t *testing.T) {
 			{Name: "consumer1", Type: "kafka"},
 			{Name: "consumer2"},
 		}
-		pageToken := &utils.PaginationToken{}
+		offset := ""
+		limit := 2
+		reversed := false
 
 		wantConsumers := []primitive.D{}
 		for i, c := range want {
@@ -46,7 +47,7 @@ func TestGetAllConsumers(t *testing.T) {
 		mt.AddMockResponses(wantConsumers...)
 
 		repo := mongodb.NewConsumerRepository(config, log, collection)
-		consumers, err := repo.GetAllConsumers(ctx, pageToken)
+		consumers, err := repo.GetPagedConsumers(ctx, offset, limit, reversed)
 
 		assert.Nil(mt, err)
 		for _, v := range consumers {

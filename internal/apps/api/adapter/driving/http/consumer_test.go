@@ -23,7 +23,7 @@ import (
 	"reprocess-gui/internal/utils"
 )
 
-func TestGetAllConsumers(t *testing.T) {
+func TestGetPagedConsumers(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			config, logger, serviceMock = consumerSetupTest(t)
@@ -50,11 +50,11 @@ func TestGetAllConsumers(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		serviceMock.
-			On("GetAllConsumers", mock.AnythingOfType("context.backgroundCtx"), pageToken, limit).
+			On("GetPagedConsumers", mock.AnythingOfType("context.backgroundCtx"), pageToken, limit).
 			Return(want, nil).Once()
 
 		handler := handler.NewConsumerHandler(config, logger, serviceMock)
-		handler.GetAllConsumers(w, req)
+		handler.GetPagedConsumers(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()
@@ -89,7 +89,7 @@ func TestGetAllConsumers(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		handler := handler.NewConsumerHandler(config, logger, serviceMock)
-		handler.GetAllConsumers(w, req)
+		handler.GetPagedConsumers(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()
@@ -125,11 +125,11 @@ func TestGetAllConsumers(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		serviceMock.
-			On("GetAllConsumers", mock.AnythingOfType("context.backgroundCtx"), pageToken, limit).
+			On("GetPagedConsumers", mock.AnythingOfType("context.backgroundCtx"), pageToken, limit).
 			Return(nil, errors.ErrEmptyResponse).Once()
 
 		handler := handler.NewConsumerHandler(config, logger, serviceMock)
-		handler.GetAllConsumers(w, req)
+		handler.GetPagedConsumers(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()

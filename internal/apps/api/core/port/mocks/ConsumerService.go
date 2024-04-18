@@ -14,12 +14,12 @@ type ConsumerService struct {
 	mock.Mock
 }
 
-// GetAllConsumers provides a mock function with given fields: ctx, pageToken, limit
-func (_m *ConsumerService) GetAllConsumers(ctx context.Context, pageToken string, limit int) (*domain.PagedConsumer, error) {
+// GetPagedConsumers provides a mock function with given fields: ctx, pageToken, limit
+func (_m *ConsumerService) GetPagedConsumers(ctx context.Context, pageToken string, limit int) (*domain.PagedConsumer, error) {
 	ret := _m.Called(ctx, pageToken, limit)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAllConsumers")
+		panic("no return value specified for GetPagedConsumers")
 	}
 
 	var r0 *domain.PagedConsumer

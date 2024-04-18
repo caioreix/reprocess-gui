@@ -27,8 +27,8 @@ func NewConsumerHandler(config *config.Config, log *logger.Logger, svc port.Cons
 	}
 }
 
-// GetAllConsumers retrieves all consumers and writes them as JSON to the response.
-func (h *consumerHandler) GetAllConsumers(w http.ResponseWriter, r *http.Request) {
+// GetPagedConsumers retrieves all consumers and writes them as JSON to the response.
+func (h *consumerHandler) GetPagedConsumers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var (
 		pageToken    = r.URL.Query().Get("page_token")
@@ -49,7 +49,7 @@ func (h *consumerHandler) GetAllConsumers(w http.ResponseWriter, r *http.Request
 		limit = defaultLimit
 	}
 
-	consumers, err := h.svc.GetAllConsumers(r.Context(), pageToken, limit)
+	consumers, err := h.svc.GetPagedConsumers(r.Context(), pageToken, limit)
 	if err != nil {
 		handleError(h.log, w, err, "failed getting all consumers")
 		return

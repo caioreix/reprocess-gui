@@ -3,15 +3,12 @@ package mongodb
 import (
 	"context"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"reprocess-gui/internal/apps/api/config"
 	"reprocess-gui/internal/apps/api/core/domain"
 	"reprocess-gui/internal/logger"
-	"reprocess-gui/internal/utils"
 )
 
 type consumerRepository struct {
@@ -29,9 +26,9 @@ func NewConsumerRepository(config *config.Config, log *logger.Logger, collection
 	}
 }
 
-// GetAllConsumers retrieves all consumers from the MongoDB collection.
-func (r *consumerRepository) GetAllConsumers(ctx context.Context, pageToken *utils.PaginationToken) ([]*domain.Consumer, error) {
-	filter, opts, err := r.buildFilterAndOptions(pageToken.Offset, pageToken.Limit, pageToken.Reversed)
+// GetPagedConsumers retrieves all consumers from the MongoDB collection.
+func (r *consumerRepository) GetPagedConsumers(ctx context.Context, offset string, limit int, reversed bool) ([]*domain.Consumer, error) {
+	filter, opts, err := buildPaginationFilterAndOptions("_id", offset, limit, reversed)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +39,7 @@ func (r *consumerRepository) GetAllConsumers(ctx context.Context, pageToken *uti
 	}
 	defer cur.Close(ctx)
 
-	consumers, err := r.decodeConsumers(ctx, cur, pageToken.Reversed)
+	consumers, err := decodePaginationResponse[domain.Consumer](ctx, cur, reversed)
 	if err != nil {
 		return nil, err
 	}
@@ -70,53 +67,4 @@ func (r *consumerRepository) GetTotalCount(ctx context.Context) (int, error) {
 	}
 
 	return count, nil
-}
-
-// buildFilterAndOptions constructs the filter and options for the MongoDB query.
-func (r *consumerRepository) buildFilterAndOptions(offset string, limit int, reversed bool) (any, *options.FindOptions, error) {
-	var filter any = bson.D{}
-	opts := options.Find().SetLimit(int64(limit + 1))
-
-	if offset != "" {
-		id, err := primitive.ObjectIDFromHex(offset)
-		if err != nil {
-			return nil, nil, err
-		}
-		filter = bson.M{"_id": bson.M{"$gt": id}}
-	}
-
-	if reversed {
-		opts = opts.SetSort(bson.M{"_id": -1})
-		if offset != "" {
-			id, _ := primitive.ObjectIDFromHex(offset)
-			filter = bson.M{"_id": bson.M{"$lt": id}}
-		}
-	}
-
-	return filter, opts, nil
-}
-
-// decodeConsumers decodes the MongoDB cursor into a slice of domain.Consumer.
-func (r *consumerRepository) decodeConsumers(ctx context.Context, cur *mongo.Cursor, reversed bool) ([]*domain.Consumer, error) {
-	consumers := []*domain.Consumer{}
-
-	for cur.Next(ctx) {
-		consumer := &domain.Consumer{}
-		err := cur.Decode(consumer)
-		if err != nil {
-			return nil, err
-		}
-
-		if reversed {
-			consumers = append([]*domain.Consumer{consumer}, consumers...)
-		} else {
-			consumers = append(consumers, consumer)
-		}
-	}
-
-	if err := cur.Err(); err != nil {
-		return nil, err
-	}
-
-	return consumers, nil
 }
