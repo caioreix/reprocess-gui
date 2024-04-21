@@ -14,6 +14,64 @@ type ConsumerRepository struct {
 	mock.Mock
 }
 
+// GetPagedConsumers provides a mock function with given fields: ctx, offset, limit, reversed
+func (_m *ConsumerRepository) GetPagedConsumers(ctx context.Context, offset string, limit int, reversed bool) ([]*domain.Consumer, error) {
+	ret := _m.Called(ctx, offset, limit, reversed)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPagedConsumers")
+	}
+
+	var r0 []*domain.Consumer
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, int, bool) ([]*domain.Consumer, error)); ok {
+		return rf(ctx, offset, limit, reversed)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, int, bool) []*domain.Consumer); ok {
+		r0 = rf(ctx, offset, limit, reversed)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.Consumer)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, int, bool) error); ok {
+		r1 = rf(ctx, offset, limit, reversed)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetTotalCount provides a mock function with given fields: ctx
+func (_m *ConsumerRepository) GetTotalCount(ctx context.Context) (int, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTotalCount")
+	}
+
+	var r0 int
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (int, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) int); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // InsertNewConsumer provides a mock function with given fields: ctx, consumer
 func (_m *ConsumerRepository) InsertNewConsumer(ctx context.Context, consumer *domain.Consumer) (*domain.Consumer, error) {
 	ret := _m.Called(ctx, consumer)

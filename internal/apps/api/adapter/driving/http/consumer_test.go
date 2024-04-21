@@ -3,6 +3,7 @@ package http_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -21,6 +22,125 @@ import (
 	"reprocess-gui/internal/logger"
 	"reprocess-gui/internal/utils"
 )
+
+func TestGetPagedConsumers(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		var (
+			config, logger, serviceMock = consumerSetupTest(t)
+			want                        = &domain.PagedConsumer{
+				Consumers: []*domain.Consumer{
+					{Name: "consumer1", Type: "kafka"},
+					{Name: "consumer2"},
+				},
+				Pagination: &utils.Pagination{},
+			}
+			pageToken = "1234"
+			limit     = 25
+		)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodGet, "/consumers", nil)
+		values := req.URL.Query()
+		values.Add("page_token", pageToken)
+		values.Add("limit", "")
+		req.URL.RawQuery = values.Encode()
+
+		w := httptest.NewRecorder()
+
+		serviceMock.
+			On("GetPagedConsumers", mock.AnythingOfType("context.backgroundCtx"), pageToken, limit).
+			Return(want, nil).Once()
+
+		handler := handler.NewConsumerHandler(config, logger, serviceMock)
+		handler.GetPagedConsumers(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		data, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		assert.Equal(t, expected.String(), string(data))
+		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
+	})
+
+	t.Run("Fail invalid limit", func(t *testing.T) {
+		var (
+			config, logger, serviceMock = consumerSetupTest(t)
+			want                        = struct {
+				Error string `json:"error"`
+			}{
+				Error: "bad request: failed converting limit",
+			}
+			pageToken = "1234"
+		)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodGet, "/consumers", nil)
+		values := req.URL.Query()
+		values.Add("page_token", pageToken)
+		values.Add("limit", "x")
+		req.URL.RawQuery = values.Encode()
+
+		w := httptest.NewRecorder()
+
+		handler := handler.NewConsumerHandler(config, logger, serviceMock)
+		handler.GetPagedConsumers(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		data, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		assert.Equal(t, expected.String(), string(data))
+		assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
+	})
+
+	t.Run("Fail empty response", func(t *testing.T) {
+		var (
+			config, logger, serviceMock = consumerSetupTest(t)
+			want                        = struct {
+				Error string `json:"error"`
+			}{
+				Error: "empty response value: failed getting all consumers",
+			}
+			pageToken = "1234"
+			limit     = 10
+		)
+		expected := &bytes.Buffer{}
+		err := json.NewEncoder(expected).Encode(want)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodGet, "/consumers", nil)
+		values := req.URL.Query()
+		values.Add("page_token", pageToken)
+		values.Add("limit", fmt.Sprint(limit))
+		req.URL.RawQuery = values.Encode()
+
+		w := httptest.NewRecorder()
+
+		serviceMock.
+			On("GetPagedConsumers", mock.AnythingOfType("context.backgroundCtx"), pageToken, limit).
+			Return(nil, errors.ErrEmptyResponse).Once()
+
+		handler := handler.NewConsumerHandler(config, logger, serviceMock)
+		handler.GetPagedConsumers(w, req)
+
+		res := w.Result()
+		defer res.Body.Close()
+
+		data, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		assert.Equal(t, expected.String(), string(data))
+		assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+		assert.Equal(t, "application/json", res.Header.Get("Content-Type"))
+	})
+}
 
 func TestInsertNewConsumer(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {

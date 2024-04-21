@@ -14,6 +14,36 @@ type ConsumerService struct {
 	mock.Mock
 }
 
+// GetPagedConsumers provides a mock function with given fields: ctx, pageToken, limit
+func (_m *ConsumerService) GetPagedConsumers(ctx context.Context, pageToken string, limit int) (*domain.PagedConsumer, error) {
+	ret := _m.Called(ctx, pageToken, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPagedConsumers")
+	}
+
+	var r0 *domain.PagedConsumer
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, int) (*domain.PagedConsumer, error)); ok {
+		return rf(ctx, pageToken, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, int) *domain.PagedConsumer); ok {
+		r0 = rf(ctx, pageToken, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.PagedConsumer)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, int) error); ok {
+		r1 = rf(ctx, pageToken, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // InsertNewConsumer provides a mock function with given fields: ctx, consumer
 func (_m *ConsumerService) InsertNewConsumer(ctx context.Context, consumer *domain.Consumer) (*domain.Consumer, error) {
 	ret := _m.Called(ctx, consumer)
