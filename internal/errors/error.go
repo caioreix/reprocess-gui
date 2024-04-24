@@ -9,6 +9,17 @@ import (
 )
 
 var (
+	// ErrRedisReaderClientNotInitialized represents an error indicating that the Redis reader client is not initialized.
+	ErrRedisReaderClientNotInitialized = newErr("redis reader client not initialized")
+	// ErrRedisWriterClientNotInitialized represents an error indicating that the Redis writer client is not initialized.
+	ErrRedisWriterClientNotInitialized = newErr("redis writer client not initialized")
+
+	// ErrCacheNotFound represents an error indicating that the cache is not found.
+	ErrCacheNotFound = newErr("cache not found")
+
+	// ErrStatusCode represents an error indicating an unexpected status code.
+	ErrStatusCode = newErr("error status code")
+
 	// ErrEmptyResponse represents an error indicating an empty response value.
 	ErrEmptyResponse = newErr("empty response value")
 	// ErrNotMapped represents an error indicating a situation where the error is not mapped.
