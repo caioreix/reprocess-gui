@@ -3,11 +3,12 @@ module reprocess-gui
 go 1.22.1
 
 require (
+	github.com/confluentinc/confluent-kafka-go/v2 v2.3.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jinzhu/configor v1.2.2
 	github.com/joho/godotenv v1.5.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/thessem/zap-prettyconsole v0.4.0
 	go.elastic.co/ecszap v1.0.2
 	go.mongodb.org/mongo-driver v1.14.0
